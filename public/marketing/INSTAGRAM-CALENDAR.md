@@ -104,7 +104,11 @@ Get started free → link in bio
 # WEEK 2 — EDUCATE ("Here's how")
 
 ### P4 · Monday · How it works (carousel)
-**Graphic:** `03-flexibility-square-1080x1080.png` (or make a 3-slide carousel — see note)
+**Graphic:** 4-slide carousel — add in this exact order:
+1. `07-carousel-1-cover-1080x1080.png`
+2. `07-carousel-2-capture-1080x1080.png`
+3. `07-carousel-3-words-1080x1080.png`
+4. `07-carousel-4-send-1080x1080.png`
 **Caption:**
 From gift pile to sent notes, in 3 steps 👇
 
@@ -118,9 +122,7 @@ Start free → link in bio
 
 **First comment:**
 #thankyounotes #howto #weddingthankyou #babyshower #gratitude #thankfulapp #organized
-**Alt text:** Three-step overview: capture, write, finish.
-**Note:** This post is stronger as a 3-slide carousel (one slide per step). Ask me
-and I'll generate `07/08/09-step` graphics to match your brand.
+**Alt text:** A 4-slide carousel: cover reading "From a pile of gifts to notes worth sending," then step 1 Capture, step 2 Get your words, step 3 Send it your way.
 
 ---
 
@@ -163,7 +165,7 @@ Start free → link in bio
 # WEEK 3 — PROVE ("It really works")
 
 ### P7 · Monday · Voices / relatable testimonial
-**Graphic:** `02-emotional-square-1080x1080.png` (or a quote-card — see note)
+**Graphic:** `08-quote-card-1080x1080.png`
 **Caption:**
 "I know I want to show my gratitude — I just don't know what to say, and honestly I'm embarrassed my spelling isn't great."
 
@@ -177,8 +179,7 @@ Start free → link in bio
 
 **First comment:**
 #thankyounotes #gratitude #thankfulapp #realtalk #mentalload #selfcare #writinghelp
-**Alt text:** A warm quote about wanting to show gratitude but not knowing what to say.
-**Note:** Want this as a branded quote-card graphic? I can generate one to match.
+**Alt text:** A terracotta quote card reading "I know I want to show my gratitude — I just never know what to say. This helped me get the words in my head onto the page." — an early Thankful user.
 
 ---
 
