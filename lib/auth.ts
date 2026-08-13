@@ -1,13 +1,17 @@
 import { betterAuth } from "better-auth"
 import { pool } from "@/lib/auth-pool"
 import { sendPasswordResetEmail } from "@/lib/email"
+import { PRODUCTION_URL, productionOrigins } from "@/lib/site"
 
 export const auth = betterAuth({
   database: pool,
   baseURL:
     process.env.BETTER_AUTH_URL ??
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    // The live production deployment always uses the custom domain, so auth
+    // cookies and password-reset links are issued for thankfulai.org. Preview
+    // deployments keep their own per-deployment URL so they stay testable.
+    (process.env.VERCEL_ENV === "production"
+      ? PRODUCTION_URL
       : process.env.VERCEL_URL
         ? `https://${process.env.VERCEL_URL}`
         : process.env.V0_RUNTIME_URL),
@@ -44,6 +48,8 @@ export const auth = betterAuth({
   //   },
   // },
   trustedOrigins: [
+    // The custom domain (apex + www) is always trusted in every environment.
+    ...productionOrigins(),
     ...(process.env.V0_RUNTIME_URL ? [process.env.V0_RUNTIME_URL] : []),
     ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
     ...(process.env.VERCEL_PROJECT_PRODUCTION_URL
