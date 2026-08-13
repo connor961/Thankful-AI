@@ -330,3 +330,58 @@ above to match.
 - **Fri** — Occasion or CTA (who it's for / start now)
 - **Off-days** — 1 Story set, reshare the week's best post to your Story,
   reply to every comment + DM within a few hours (early engagement = reach).
+
+---
+
+# CIRCULATION LIBRARY — 20 extra graphics
+
+Evergreen posts to keep in rotation after (or during) the 4-week launch. All
+live in `/marketing/circulation/`. Mix them into the weekly rhythm — pull an
+**occasion** post for timely moments, a **feature** or **tip** on Mondays, a
+**quote/statement** on Wednesdays. Captions below are ready to paste; add the
+same first-comment hashtag banks you use above and swap `[your-link]`.
+
+## Occasions (square 1:1) — use when the moment is timely
+- **`09-occasion-graduation`** — "Grad season = a stack of cards, cash, and checks from people rooting for you. Thankful keeps every giver straight so no one gets missed. 🎓 Start free → link in bio"
+- **`10-occasion-holidays`** — "Before the tree comes down: those holiday gifts deserve a thank-you. Capture who gave what while it's fresh, and send warm notes before New Year's. 🎄 Start free → link in bio"
+- **`11-occasion-housewarming`** — "New place, lots of helping hands. Everyone who brought a gift (or a casserole) deserves a note — Thankful helps you write them between the unpacking. 🏡 link in bio"
+- **`12-occasion-birthday`** — "The group gift. The card that made you cry-laugh. Remember every one and thank them in your own words. 🎂 Start free → link in bio"
+- **`13-occasion-milestones`** — "Retirement, a promotion, a big anniversary — when people show up, a thank-you means everything. We'll help you say it well. 🥂 link in bio"
+
+## Feature spotlights (square 1:1) — great for Mondays
+- **`14-feature-record`** — "Don't want to type? Just talk. Record the gift-opening and Thankful transcribes it into your gift list — who gave what, captured in the moment. 🎙️ link in bio"
+- **`15-feature-postcard`** — "A real card in the mail, minus the envelope. Print a ready-to-send postcard — your note on one side, their address on the other. Stamp it, send it. 💌 link in bio"
+- **`16-feature-labels`** — "60 envelopes, zero hand cramps. Store addresses once, print a full sheet of Avery labels. Peel, stick, send. 🏷️ link in bio"
+- **`17-feature-edit-together`** — "AI gives you a first draft from the real details — then you make it yours, line by line. Hands-on or hands-off, your call. ✍️ link in bio"
+
+## Testimonial quote cards (square 1:1) — proof, good for Wed/Fri
+- **`18-quote-cleared-pile`** — "'I finally cleared a pile I'd been avoiding for months. It felt so good.' That relief? It's why we built this. 🤍 Start free → link in bio"
+- **`19-quote-not-generic`** — "'It helped me say what I actually felt — not some stiff, generic card.' Your voice, just easier to find. link in bio"
+- **`20-quote-not-a-writer`** — "'I'm not a writer. This made me feel like one, in my own voice.' You don't have to be a wordsmith to send something that lands. link in bio"
+
+## Tips & education (1:1 + 4:5) — save-worthy, boosts reach
+- **`21-tip-skip-thankyou`** — "Note-writing tip: skip 'thank you for the gift.' Name the actual gift, say how you'll use it, and end with a line about *them*. 3 small moves, way warmer notes. ✍️ link in bio"
+- **`22-tip-3-things`** *(vertical 4:5)* — "The 3 things every thank-you should say 👇 the specific gift, how it made you feel, and a warm closing to them. Screenshot this for your next batch. 💌 link in bio"
+
+## Myth-buster & statements (1:1) — scroll-stoppers
+- **`23-myth-robotic`** — "'Won't an AI note sound like a robot?' Not here. Thankful drafts from real details and your voice — then you shape every word. It never sends for you. link in bio"
+- **`26-statement-moment-fades`** — "Gratitude doesn't expire — but the moment fades. Capture it now, write it when you're ready. We'll hold onto the details. link in bio"
+- **`27-statement-not-perfect`** — "The card doesn't have to be perfect. It just has to be sent. Start with one — we'll help with the rest. 🤍 link in bio"
+
+## Stat cards (1:1) — punchy, shareable
+- **`24-stat-100-notes`** — "The average wedding leaves you with 100+ thank-yous. Thankful makes sure not one gets missed. 💍 Start free → link in bio"
+- **`25-stat-5-min`** — "With the details captured and a draft ready, each note takes about 5 minutes — not a whole dreaded afternoon. ⏱️ link in bio"
+
+## Story frame (9:16) — for off-days
+- **`28-story-clear-the-pile`** *(1080×1920)* — Pair with a poll ("I'm in" / "I'm in, nervous") and a Link sticker. Great weekend nudge.
+
+### Suggested rotation after launch (repeatable month)
+| Week | Mon (feature/tip) | Wed (emotional/quote) | Fri (occasion/CTA) |
+|------|-------------------|------------------------|---------------------|
+| A | 14 Record | 18 Quote | Timely occasion (09–13) |
+| B | 21 Tip | 23 Myth-buster | 24 Stat (weddings) |
+| C | 17 Edit together | 19 Quote | 27 Statement |
+| D | 16 Labels | 26 Statement | 25 Stat (5-min) |
+
+Rotate the **occasion** posts (09–13) in whenever they're seasonally relevant —
+they'll always outperform an evergreen post when the timing is right.
