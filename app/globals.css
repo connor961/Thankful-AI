@@ -1,0 +1,203 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-hand: var(--font-caveat), 'Segoe Print', 'Bradley Hand', cursive;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  color-scheme: light;
+  --background: oklch(0.985 0.012 60);
+  --foreground: oklch(0.29 0.045 28);
+  --card: oklch(0.995 0.006 70);
+  --card-foreground: oklch(0.29 0.045 28);
+  --popover: oklch(0.995 0.006 70);
+  --popover-foreground: oklch(0.29 0.045 28);
+  --primary: oklch(0.585 0.168 18);
+  --primary-foreground: oklch(0.99 0.01 60);
+  --secondary: oklch(0.94 0.03 55);
+  --secondary-foreground: oklch(0.36 0.06 30);
+  --muted: oklch(0.955 0.018 60);
+  --muted-foreground: oklch(0.53 0.04 32);
+  --accent: oklch(0.82 0.1 72);
+  --accent-foreground: oklch(0.31 0.06 40);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.9 0.02 50);
+  --input: oklch(0.9 0.02 50);
+  --ring: oklch(0.585 0.168 18);
+  --chart-1: oklch(0.585 0.168 18);
+  --chart-2: oklch(0.72 0.13 55);
+  --chart-3: oklch(0.82 0.1 72);
+  --chart-4: oklch(0.6 0.08 145);
+  --chart-5: oklch(0.5 0.1 300);
+  --radius: 0.875rem;
+  --sidebar: oklch(0.97 0.016 60);
+  --sidebar-foreground: oklch(0.29 0.045 28);
+  --sidebar-primary: oklch(0.585 0.168 18);
+  --sidebar-primary-foreground: oklch(0.99 0.01 60);
+  --sidebar-accent: oklch(0.94 0.03 55);
+  --sidebar-accent-foreground: oklch(0.36 0.06 30);
+  --sidebar-border: oklch(0.9 0.02 50);
+  --sidebar-ring: oklch(0.585 0.168 18);
+}
+
+.dark {
+  color-scheme: dark;
+  --background: oklch(0.22 0.03 30);
+  --foreground: oklch(0.95 0.015 60);
+  --card: oklch(0.26 0.035 30);
+  --card-foreground: oklch(0.95 0.015 60);
+  --popover: oklch(0.26 0.035 30);
+  --popover-foreground: oklch(0.95 0.015 60);
+  --primary: oklch(0.68 0.15 20);
+  --primary-foreground: oklch(0.2 0.03 30);
+  --secondary: oklch(0.33 0.04 32);
+  --secondary-foreground: oklch(0.95 0.015 60);
+  --muted: oklch(0.3 0.03 30);
+  --muted-foreground: oklch(0.73 0.03 50);
+  --accent: oklch(0.78 0.11 72);
+  --accent-foreground: oklch(0.25 0.04 40);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.68 0.15 20);
+  --chart-1: oklch(0.68 0.15 20);
+  --chart-2: oklch(0.75 0.13 55);
+  --chart-3: oklch(0.82 0.1 72);
+  --chart-4: oklch(0.65 0.09 145);
+  --chart-5: oklch(0.62 0.12 300);
+  --sidebar: oklch(0.24 0.032 30);
+  --sidebar-foreground: oklch(0.95 0.015 60);
+  --sidebar-primary: oklch(0.68 0.15 20);
+  --sidebar-primary-foreground: oklch(0.2 0.03 30);
+  --sidebar-accent: oklch(0.33 0.04 32);
+  --sidebar-accent-foreground: oklch(0.95 0.015 60);
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: oklch(0.68 0.15 20);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/*
+ * Printable fold card. The real sheet is portaled to <body> as #print-card-root
+ * and parked off-screen so it never shows in the app.
+ */
+#print-card-root {
+  position: fixed;
+  top: 0;
+  left: -300vw;
+  z-index: -1;
+}
+
+@page {
+  size: Letter portrait;
+  margin: 0;
+}
+
+@media print {
+  /*
+   * Remove everything except the card from the layout entirely. Using
+   * `display: none` (not `visibility: hidden`) collapses the document to a
+   * single page — otherwise the hidden app keeps its full height and the
+   * `position: fixed` sheet repeats on every resulting page.
+   */
+  body > *:not(#print-card-root) {
+    display: none !important;
+  }
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+  /* Flow the sheet in normal document order so it occupies exactly one page. */
+  #print-card-root {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    z-index: auto !important;
+    margin: 0 !important;
+    break-inside: avoid;
+  }
+  /* Fold guides are a screen-only aid; keep them off the printed sheet. */
+  .print-fold-guide {
+    display: none !important;
+  }
+  /*
+   * Address-label sheets can span multiple pages, so the single-page
+   * `break-inside: avoid` above must not apply when labels are printing.
+   * Each sheet gets its own page; the last one doesn't force a trailing blank.
+   */
+  #print-card-root:has(.print-label-sheet) {
+    break-inside: auto !important;
+  }
+  .print-label-sheet {
+    break-after: page;
+  }
+  .print-label-sheet:last-child {
+    break-after: auto;
+  }
+  /*
+   * Postcards print as two pages (front art, then message + address back) so
+   * they can be run double-sided. Same page-break treatment as label sheets.
+   */
+  #print-card-root:has(.print-postcard-page) {
+    break-inside: auto !important;
+  }
+  .print-postcard-page {
+    break-after: page;
+  }
+  .print-postcard-page:last-child {
+    break-after: auto;
+  }
+}
