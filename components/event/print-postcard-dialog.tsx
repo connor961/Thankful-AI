@@ -104,6 +104,32 @@ function PostcardPage({ children }: { children: React.ReactNode }) {
   )
 }
 
+/**
+ * A complementary eyebrow for the postcard front. The shared card themes reuse
+ * "THANK YOU" as the eyebrow for the modern design, which would repeat the
+ * "Thank you" title on the postcard. We pick a phrase per design that pairs
+ * with the title instead of echoing it, and never let the eyebrow duplicate
+ * the title wording.
+ */
+function frontEyebrow(theme: CardTheme, design: EmailDesign): string {
+  const preferred: Record<EmailDesign, string> = {
+    classic: "WITH GRATITUDE",
+    modern: "A NOTE OF THANKS",
+    playful: "HOORAY",
+  }
+  const normalize = (s: string) =>
+    s
+      .toLowerCase()
+      .replace(/[^a-z]/g, "")
+      .trim()
+  // If the theme's own eyebrow already differs from the title, keep it;
+  // otherwise fall back to the complementary phrase above.
+  if (normalize(theme.eyebrow) !== normalize(theme.title)) {
+    return theme.eyebrow
+  }
+  return preferred[design]
+}
+
 /** Front of the postcard: the "Thank you" art side, matching the fold card. */
 function PostcardFront({ theme, design }: { theme: CardTheme; design: EmailDesign }) {
   return (
@@ -131,7 +157,7 @@ function PostcardFront({ theme, design }: { theme: CardTheme; design: EmailDesig
           color: theme.eyebrowColor,
         }}
       >
-        {theme.eyebrow}
+        {frontEyebrow(theme, design)}
       </div>
       <div
         style={{
