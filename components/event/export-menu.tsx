@@ -10,8 +10,10 @@ import {
   Tag,
   Share,
   ChevronDown,
+  Lock,
 } from "lucide-react"
 import type { EventRow, GiftWithNote, LabelAddress } from "@/lib/types"
+import { openUpgradeDialog } from "@/components/billing/upgrade-dialog"
 import {
   downloadFile,
   notesToCsv,
@@ -37,11 +39,14 @@ export function ExportMenu({
   items,
   contactAddresses = {},
   returnAddress = null,
+  canPrint = false,
 }: {
   event: EventRow
   items: GiftWithNote[]
   contactAddresses?: Record<string, LabelAddress>
   returnAddress?: LabelAddress | null
+  /** Whether printing & mailing is unlocked (paid plan or Event Pass). */
+  canPrint?: boolean
 }) {
   const count = shareableItems(items).length
   const slug = slugify(event.name)
@@ -134,10 +139,24 @@ export function ExportMenu({
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuLabel>Mail</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => setLabelsOpen(true)}>
-            <Tag data-icon="inline-start" />
-            Print address labels
-          </DropdownMenuItem>
+          {canPrint ? (
+            <DropdownMenuItem onClick={() => setLabelsOpen(true)}>
+              <Tag data-icon="inline-start" />
+              Print address labels
+            </DropdownMenuItem>
+          ) : (
+            <DropdownMenuItem
+              onClick={() =>
+                openUpgradeDialog(
+                  "Printing address labels is available on any paid plan or with an Event Pass.",
+                )
+              }
+            >
+              <Tag data-icon="inline-start" />
+              Print address labels
+              <Lock data-icon="inline-end" className="ml-auto text-muted-foreground" />
+            </DropdownMenuItem>
+          )}
         </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>

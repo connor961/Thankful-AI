@@ -38,8 +38,11 @@ import type {
   Tone,
 } from "@/lib/types"
 
-/** Shared friendly message shown when a user hits their plan's monthly cap. */
-function limitMessage(limit: number | null): string {
+/** Shared friendly message shown when a user hits their plan's note cap. */
+function limitMessage(limit: number | null, lifetime = false): string {
+  if (lifetime) {
+    return `You've used all ${limit ?? 0} of your free notes. Upgrade to a plan or grab an Event Pass to keep going.`
+  }
   return `You've reached your monthly limit of ${limit ?? 0} notes. Upgrade your plan to keep going.`
 }
 
@@ -269,7 +272,7 @@ export async function processTranscript(
 
   const usage = await getUsage(userId)
   if (usage.atLimit) {
-    return { ok: false, code: "limit_reached", error: limitMessage(usage.limit) }
+    return { ok: false, code: "limit_reached", error: limitMessage(usage.limit, usage.lifetime) }
   }
 
   // 1) Extract the gifts, then 2) draft every note in a SINGLE batched call.
@@ -346,7 +349,7 @@ export type TranscribeMediaResult =
 /**
  * Transcribes an uploaded gift-opening recording (already sitting in Blob under
  * `event-media/<userId>/…`) into text, then deletes the blob. The transcript is
- * returned to the client for review — it is NOT auto-processed — so the user can
+ * returned to the client for review �� it is NOT auto-processed — so the user can
  * fix any mis-hearings before `processTranscript` extracts gifts from it.
  *
  * The plan gate is re-checked here even though the upload token route also checks
@@ -479,7 +482,7 @@ export async function addManualGift(
 
   const usage = await getUsage(userId)
   if (usage.atLimit) {
-    return { ok: false, code: "limit_reached", error: limitMessage(usage.limit) }
+    return { ok: false, code: "limit_reached", error: limitMessage(usage.limit, usage.lifetime) }
   }
 
   let noteContent: string
@@ -573,7 +576,7 @@ export async function addManualGiftsBulk(
 
   const usage = await getUsage(userId)
   if (usage.atLimit) {
-    return { ok: false, code: "limit_reached", error: limitMessage(usage.limit) }
+    return { ok: false, code: "limit_reached", error: limitMessage(usage.limit, usage.lifetime) }
   }
 
   // Draft every note in one call to stay fast and dodge per-minute rate limits.
@@ -661,7 +664,7 @@ export async function regenerateNote(
 
   const usage = await getUsage(userId)
   if (usage.atLimit) {
-    return { ok: false, code: "limit_reached", error: limitMessage(usage.limit) }
+    return { ok: false, code: "limit_reached", error: limitMessage(usage.limit, usage.lifetime) }
   }
 
   const giftRows = (await sql`SELECT * FROM gifts WHERE id = ${note.gift_id}`) as GiftRow[]
@@ -716,7 +719,7 @@ export async function regenerateAllNotes(
 
   const usage = await getUsage(userId)
   if (usage.atLimit) {
-    return { ok: false, code: "limit_reached", error: limitMessage(usage.limit) }
+    return { ok: false, code: "limit_reached", error: limitMessage(usage.limit, usage.lifetime) }
   }
 
   // One note per gift; order by the gift timeline so indices are stable.
@@ -902,7 +905,7 @@ export async function sendNote(noteId: string): Promise<SendNoteResult> {
     return {
       ok: false,
       code: "limit_reached",
-      error: limitMessage(usage.limit),
+      error: limitMessage(usage.limit, usage.lifetime),
     }
   }
 

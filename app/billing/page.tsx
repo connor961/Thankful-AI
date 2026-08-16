@@ -42,6 +42,7 @@ export default async function BillingPage() {
     fromPass: usage.fromPass,
     passRemaining: activePass?.remaining ?? null,
     canBuyPass: plan.id === "free" && !everHadPass,
+    lifetime: usage.lifetime,
   }
 
   return (
@@ -53,7 +54,7 @@ export default async function BillingPage() {
             Billing &amp; plans
           </h1>
           <p className="mt-2 max-w-xl text-muted-foreground text-pretty">
-            Track your monthly usage, change plans, and manage payment details.
+            Track your usage, change plans, and manage payment details.
           </p>
         </header>
         <Suspense>

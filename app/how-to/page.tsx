@@ -100,7 +100,11 @@ const FAQS = [
   },
   {
     q: "How many notes can I create?",
-    a: "Every plan includes AI drafting and email delivery, with a monthly notes-sent limit that scales with your plan. Check the pricing page for the details and one-time Event Pass option.",
+    a: "You start with 20 free thank-you notes — yours to use whenever you like, with no monthly reset. When you need more, paid plans add a monthly notes-sent allowance that scales with your plan, or a one-time Event Pass covers a single big celebration. Check the pricing page for details.",
+  },
+  {
+    q: "Can I print and mail physical cards?",
+    a: "Yes — printing and mailing (fold cards, postcards, and address labels) is included on every paid plan and with the Event Pass. On the free tier you can draft, edit, and email notes; printing unlocks as soon as you upgrade or buy a pass.",
   },
 ]
 

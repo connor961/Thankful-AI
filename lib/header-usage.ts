@@ -20,5 +20,7 @@ export async function getHeaderUsage(): Promise<HeaderUsage | null> {
     used: usage.used,
     limit: usage.limit,
     unlimited: usage.unlimited,
+    lifetime: usage.lifetime,
+    canPrint: usage.canPrint,
   }
 }

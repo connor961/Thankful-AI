@@ -54,6 +54,7 @@ export function EventWorkspace({
   returnAddress = null,
   senderAddress,
   planId,
+  canPrint = false,
 }: {
   event: EventRow
   items: GiftWithNote[]
@@ -63,6 +64,8 @@ export function EventWorkspace({
   returnAddress?: LabelAddress | null
   senderAddress?: string
   planId?: PlanId
+  /** Whether printing & mailing is unlocked (paid plan or Event Pass). */
+  canPrint?: boolean
 }) {
   const [filter, setFilter] = useState<ReviewFilter>("attention")
 
@@ -201,6 +204,7 @@ export function EventWorkspace({
             items={items}
             contactAddresses={contactAddresses}
             returnAddress={returnAddress}
+            canPrint={canPrint}
           />
           <Dialog>
             <DialogTrigger
@@ -328,6 +332,7 @@ export function EventWorkspace({
               senderAddress={senderAddress}
               recipientAddress={addressFor(item.giver)}
               returnAddress={returnAddress}
+              canPrint={canPrint}
             />
           ))
         )}
