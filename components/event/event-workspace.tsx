@@ -23,6 +23,7 @@ import { ManualGiftDialog } from "@/components/event/manual-gift-dialog"
 import { BulkGiftDialog } from "@/components/event/bulk-gift-dialog"
 import { EditEventDialog } from "@/components/event/edit-event-dialog"
 import { RegenerateAllDialog } from "@/components/event/regenerate-all-dialog"
+import { SampleEventBanner } from "@/components/event/sample-event-banner"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -167,6 +168,7 @@ export function EventWorkspace({
 
   return (
     <Tabs defaultValue="notes" className="gap-6">
+      {event.is_sample ? <SampleEventBanner eventId={event.id} /> : null}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <TabsList>
           <TabsTrigger value="notes">
