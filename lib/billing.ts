@@ -7,7 +7,9 @@ import { isAdmin } from "@/lib/admin"
 import { stripe } from "@/lib/stripe"
 import {
   EVENT_PASS,
+  FREE_TIER_EPOCH,
   getPlan,
+  planCanPrint,
   planForPriceId,
   type Plan,
   type PlanId,
@@ -67,6 +69,17 @@ export type Usage = {
    * (which never resets), and `periodEnd` is not meaningful.
    */
   fromPass: boolean
+  /**
+   * True when the Free allowance is a one-time lifetime total (no monthly
+   * reset) rather than a recurring window. Lets the UI phrase usage correctly.
+   */
+  lifetime: boolean
+  /**
+   * True when the user may print & mail cards/labels — i.e. they're on a paid
+   * subscription OR hold an Event Pass. This is the authoritative print gate;
+   * the Free trial tier alone is false.
+   */
+  canPrint: boolean
 }
 
 /**
@@ -150,6 +163,8 @@ export async function getUsage(userId: string): Promise<Usage> {
       atLimit: false,
       periodEnd: monthEnd.toISOString(),
       fromPass: false,
+      lifetime: false,
+      canPrint: true,
     }
   }
 
@@ -172,11 +187,19 @@ export async function getUsage(userId: string): Promise<Usage> {
         atLimit: pass.remaining <= 0,
         periodEnd: end0().toISOString(),
         fromPass: true,
+        lifetime: true,
+        // A paid Event Pass unlocks printing & mailing.
+        canPrint: true,
       }
     }
   }
 
-  const { start, end } = periodBounds(sub)
+  // Free is a lifetime allowance that never resets: count every note ever sent
+  // on/after the lifetime epoch. Paid plans meter against their billing window.
+  const lifetime = plan.id === "free"
+  const { start, end } = lifetime
+    ? { start: FREE_TIER_EPOCH, end: end0() }
+    : periodBounds(sub)
 
   const rows = (await sql`
     SELECT COUNT(*)::int AS count
@@ -198,6 +221,9 @@ export async function getUsage(userId: string): Promise<Usage> {
     atLimit: !unlimited && used >= (limit as number),
     periodEnd: end.toISOString(),
     fromPass: false,
+    lifetime,
+    // Printing is a paid feature: unlocked by any paid subscription plan.
+    canPrint: planCanPrint(plan.id),
   }
 }
 

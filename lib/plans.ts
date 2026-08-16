@@ -5,8 +5,18 @@ export type Plan = {
   name: string
   /** Monthly price in cents. */
   priceInCents: number
-  /** Notes that can be sent/generated per period. `null` = unlimited. */
+  /**
+   * Notes that can be sent/generated per period. `null` = unlimited.
+   * For lifetime plans (see `lifetime`), this is a one-time total that never
+   * resets rather than a per-month allowance.
+   */
   monthlyLimit: number | null
+  /**
+   * When true, `monthlyLimit` is a one-time lifetime allowance that never
+   * resets (used for the Free trial tier). When false/undefined, the limit is
+   * a recurring per-period allowance.
+   */
+  lifetime?: boolean
   /** Env var name holding the Stripe recurring price id (paid plans only). */
   priceEnvKey?: string
   tagline: string
@@ -25,13 +35,14 @@ export const PLANS: Plan[] = [
     id: "free",
     name: "Free",
     priceInCents: 0,
-    monthlyLimit: 10,
-    tagline: "Try the product, no card required.",
+    monthlyLimit: 20,
+    lifetime: true,
+    tagline: "Try the product free — no card, no monthly reset.",
     features: [
-      "10 thank-you notes per month",
+      "20 thank-you notes to start",
+      "Yours to use anytime — no monthly reset",
       "AI thank-you note generation",
-      "Manual gift entry",
-      "Transcript upload",
+      "Record, upload, or type your gifts",
       "Email delivery",
     ],
   },
@@ -45,6 +56,7 @@ export const PLANS: Plan[] = [
     features: [
       "100 thank-you notes per month",
       "Everything in Free",
+      "Print & mail: fold cards, postcards & address labels",
       "Photo cards in emails",
       "Faster AI generation",
     ],
@@ -75,6 +87,7 @@ export const PLANS: Plan[] = [
     tagline: "For professionals, event planners, photographers, and businesses.",
     features: [
       "Unlimited thank-you notes",
+      "Print & mail: fold cards, postcards & address labels",
       "Video & audio upload with auto-transcription",
       "Unlimited events",
       "Client management",
@@ -110,6 +123,7 @@ export const EVENT_PASS = {
     "250 thank-you notes",
     "Covers one event",
     "Credits never expire",
+    "Print & mail: fold cards, postcards & address labels",
     "AI note generation",
     "Transcript upload",
     "Manual gift entry",
@@ -133,6 +147,35 @@ export const MEDIA_UPLOAD_PLANS: PlanId[] = ["family", "pro"]
 export function canUploadMedia(id: string | null | undefined): boolean {
   return MEDIA_UPLOAD_PLANS.includes(getPlan(id).id)
 }
+
+/**
+ * Subscription plans that unlock printing & mailing (fold cards, postcards, and
+ * address labels). The Free trial tier is intentionally excluded — printing is
+ * a paid feature. A one-time Event Pass ALSO unlocks printing, but that isn't a
+ * plan, so it's handled in the billing layer (see `getUsage().canPrint`), not
+ * here. Use `Usage.canPrint` for the real check whenever a pass might apply.
+ */
+export const PRINT_PLANS: PlanId[] = ["starter", "family", "pro"]
+
+/** Whether the given subscription plan (ignoring passes) unlocks printing. */
+export function planCanPrint(id: string | null | undefined): boolean {
+  return PRINT_PLANS.includes(getPlan(id).id)
+}
+
+/**
+ * The lifetime allowance for the Free tier: 20 notes total, no monthly reset.
+ * Kept as a named constant so copy and enforcement can't drift apart.
+ */
+export const FREE_LIFETIME_LIMIT = 20
+
+/**
+ * The moment the lifetime Free allowance began counting. Free-tier usage counts
+ * only notes sent on/after this instant, so switching from the old monthly
+ * model starts every existing free user fresh at 0 rather than retroactively
+ * charging them for notes sent under the previous pricing. Paid plans and Event
+ * Passes are unaffected (they meter against their own windows/pools).
+ */
+export const FREE_TIER_EPOCH = new Date("2026-08-15T00:00:00.000Z")
 
 export function getPlan(id: string | null | undefined): Plan {
   return PLANS.find((p) => p.id === id) ?? FREE_PLAN

@@ -11,6 +11,7 @@ import {
   Trash2,
   CheckCircle2,
   AlertCircle,
+  Sparkles,
 } from "lucide-react"
 import type { EventWithStats } from "@/app/actions/events"
 import { deleteEvent } from "@/app/actions/events"
@@ -50,9 +51,17 @@ export function EventCard({ event }: { event: EventWithStats }) {
       />
       <CardContent className="flex flex-col gap-3">
         <div className="flex items-start justify-between gap-2">
-          <Badge variant="secondary" className="capitalize">
-            {EVENT_TYPE_LABELS[event.event_type] ?? event.event_type}
-          </Badge>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <Badge variant="secondary" className="capitalize">
+              {EVENT_TYPE_LABELS[event.event_type] ?? event.event_type}
+            </Badge>
+            {event.is_sample ? (
+              <Badge className="gap-1 bg-primary/10 text-primary">
+                <Sparkles className="size-3" />
+                Sample
+              </Badge>
+            ) : null}
+          </div>
           <DropdownMenu>
             <DropdownMenuTrigger
               render={

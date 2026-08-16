@@ -11,11 +11,14 @@ export function UsageIndicator({
   used,
   limit,
   unlimited,
+  lifetime = false,
 }: {
   planName: string
   used: number
   limit: number | null
   unlimited: boolean
+  /** When true, the allowance is a lifetime total (no monthly reset). */
+  lifetime?: boolean
 }) {
   const atLimit = !unlimited && limit !== null && used >= limit
   const nearLimit = !unlimited && limit !== null && used >= limit * 0.8
@@ -37,7 +40,11 @@ export function UsageIndicator({
       type="button"
       onClick={() =>
         atLimit
-          ? openUpgradeDialog("You've used all your notes this month. Upgrade to keep sending.")
+          ? openUpgradeDialog(
+              lifetime
+                ? "You've used all your free notes. Upgrade to a plan or grab an Event Pass to keep sending."
+                : "You've used all your notes this period. Upgrade to keep sending.",
+            )
           : (window.location.href = "/billing")
       }
       className={cn(

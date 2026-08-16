@@ -32,6 +32,8 @@ export type EventRow = {
   email_design: EmailDesign
   status: string
   photo_url: string
+  /** True for the one-click demo event seeded for new users. */
+  is_sample: boolean
   created_at: string
 }
 

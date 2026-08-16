@@ -9,6 +9,7 @@ import {
 } from "lucide-react"
 import type { SessionUser } from "@/components/user-menu"
 import { Button } from "@/components/ui/button"
+import { SampleEventButton } from "@/components/dashboard/sample-event-button"
 
 /**
  * First-run experience shown on the dashboard when a user has no events yet.
@@ -68,18 +69,22 @@ export function DashboardWelcome({ user }: { user: SessionUser }) {
             Create your first event
             <ArrowRight data-icon="inline-end" />
           </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            nativeButton={false}
-            render={<Link href="/how-to" />}
-          >
-            See how it works
-          </Button>
+          <SampleEventButton />
         </div>
         <p className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
           <Clock className="size-4" />
-          About 2 minutes to set up your first event.
+          About 2 minutes to set up your first event — or explore a ready-made
+          sample in one click.
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Curious how it works?{" "}
+          <Link
+            href="/how-to"
+            className="font-medium text-foreground underline underline-offset-4"
+          >
+            See the full walkthrough
+          </Link>
+          .
         </p>
       </section>
 

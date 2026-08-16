@@ -44,6 +44,8 @@ export type BillingSummary = {
   fromPass: boolean
   passRemaining: number | null
   canBuyPass: boolean
+  /** Free allowance is a lifetime total (no monthly reset) when true. */
+  lifetime: boolean
 }
 
 export function BillingPanel({ summary }: { summary: BillingSummary }) {
@@ -184,7 +186,11 @@ export function BillingPanel({ summary }: { summary: BillingSummary }) {
         <div className="mt-6">
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">
-              {summary.fromPass ? "Event Pass" : "This month"}
+              {summary.fromPass
+                ? "Event Pass"
+                : summary.lifetime
+                  ? "Free notes used"
+                  : "This month"}
             </span>
             <span className="font-medium text-foreground">
               {summary.unlimited
@@ -215,7 +221,9 @@ export function BillingPanel({ summary }: { summary: BillingSummary }) {
           </p>
         ) : (
           <p className="mt-4 text-sm text-muted-foreground">
-            Your free allowance resets on the 1st of each month.
+            Your {summary.limit ?? 20} free notes are yours to use anytime —
+            they don&apos;t reset each month. Upgrade or grab an Event Pass for
+            more.
           </p>
         )}
       </section>

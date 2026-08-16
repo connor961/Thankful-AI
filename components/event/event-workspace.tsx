@@ -23,6 +23,7 @@ import { ManualGiftDialog } from "@/components/event/manual-gift-dialog"
 import { BulkGiftDialog } from "@/components/event/bulk-gift-dialog"
 import { EditEventDialog } from "@/components/event/edit-event-dialog"
 import { RegenerateAllDialog } from "@/components/event/regenerate-all-dialog"
+import { SampleEventBanner } from "@/components/event/sample-event-banner"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -54,6 +55,7 @@ export function EventWorkspace({
   returnAddress = null,
   senderAddress,
   planId,
+  canPrint = false,
 }: {
   event: EventRow
   items: GiftWithNote[]
@@ -63,6 +65,8 @@ export function EventWorkspace({
   returnAddress?: LabelAddress | null
   senderAddress?: string
   planId?: PlanId
+  /** Whether printing & mailing is unlocked (paid plan or Event Pass). */
+  canPrint?: boolean
 }) {
   const [filter, setFilter] = useState<ReviewFilter>("attention")
 
@@ -164,6 +168,7 @@ export function EventWorkspace({
 
   return (
     <Tabs defaultValue="notes" className="gap-6">
+      {event.is_sample ? <SampleEventBanner eventId={event.id} /> : null}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <TabsList>
           <TabsTrigger value="notes">
@@ -201,6 +206,7 @@ export function EventWorkspace({
             items={items}
             contactAddresses={contactAddresses}
             returnAddress={returnAddress}
+            canPrint={canPrint}
           />
           <Dialog>
             <DialogTrigger
@@ -328,6 +334,7 @@ export function EventWorkspace({
               senderAddress={senderAddress}
               recipientAddress={addressFor(item.giver)}
               returnAddress={returnAddress}
+              canPrint={canPrint}
             />
           ))
         )}

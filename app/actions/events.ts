@@ -38,8 +38,11 @@ import type {
   Tone,
 } from "@/lib/types"
 
-/** Shared friendly message shown when a user hits their plan's monthly cap. */
-function limitMessage(limit: number | null): string {
+/** Shared friendly message shown when a user hits their plan's note cap. */
+function limitMessage(limit: number | null, lifetime = false): string {
+  if (lifetime) {
+    return `You've used all ${limit ?? 0} of your free notes. Upgrade to a plan or grab an Event Pass to keep going.`
+  }
   return `You've reached your monthly limit of ${limit ?? 0} notes. Upgrade your plan to keep going.`
 }
 
@@ -158,7 +161,8 @@ export async function createEvent(input: {
   const sub = await getSubscription(userId)
   if (effectivePlan(sub).id === "free" && (await hasAnyPass(userId))) {
     const existing = (await sql`
-      SELECT COUNT(*)::int AS count FROM events WHERE user_id = ${userId}
+      SELECT COUNT(*)::int AS count FROM events
+      WHERE user_id = ${userId} AND is_sample = false
     `) as { count: number }[]
     if ((existing[0]?.count ?? 0) >= 1) {
       throw new Error(
@@ -184,6 +188,115 @@ export async function createEvent(input: {
   `) as { id: string }[]
   revalidatePath("/")
   return rows[0].id
+}
+
+/**
+ * The seeded content for the one-click sample event. Kept as a module constant
+ * so the notes read as genuinely warm, specific examples (the "aha" moment for
+ * a new user) rather than filler. Notes are stored as `draft` status, so they
+ * never create `note_sends` rows and therefore never consume any of the user's
+ * free-note allowance.
+ */
+const SAMPLE_GIFTS: {
+  giver: string
+  relationship: string
+  gift: string
+  reaction: string
+  note: string
+}[] = [
+  {
+    giver: "Aunt Miriam",
+    relationship: "Aunt",
+    gift: "KitchenAid stand mixer",
+    reaction:
+      "She remembered how much Sam loves to bake and teared up watching us open it.",
+    note: "Dear Aunt Miriam, thank you so much for the KitchenAid stand mixer — we still smile remembering how you teared up watching us unwrap it. Sam put it to work the very first weekend on a batch of cinnamon rolls, and every time it hums to life on the counter we think of you. Thank you for knowing us so well. With love, Alex & Sam",
+  },
+  {
+    giver: "The Patel Family",
+    relationship: "Family friends",
+    gift: "weekend cabin getaway",
+    reaction: "A surprise voucher for a lake cabin — we can't wait to go.",
+    note: "Dear Patel family, we are so touched by the weekend cabin getaway — what a thoughtful and generous surprise. After all the joyful chaos of the wedding, a couple of quiet days by the lake is exactly what we've been dreaming of, and we can't wait to unplug and soak it all in. Thank you for giving us a memory we'll hold onto for years. Warmly, Alex & Sam",
+  },
+  {
+    giver: "Grandpa Lou",
+    relationship: "Grandfather",
+    gift: "handwritten family recipe book and cast-iron skillet",
+    reaction: "His own recipes copied out by hand — we both cried.",
+    note: "Dear Grandpa Lou, we don't quite have the words for how much the handwritten recipe book means to us — seeing your recipes in your own hand, paired with the cast-iron skillet, brought us both to tears. We can't wait to cook our way through every page and keep these traditions alive in our own kitchen. Thank you for this piece of our family's history. All our love, Alex & Sam",
+  },
+]
+
+/**
+ * Seeds a ready-made sample event (a wedding with three gifts and three drafted
+ * thank-you notes) so a brand-new user can explore the full workflow instantly
+ * — no data entry, no AI wait, and no cost to their free-note allowance since
+ * the notes are drafts, not sends. Flagged `is_sample = true` so it can carry a
+ * "Sample" badge, be excluded from the Event Pass one-event limit, and be
+ * cleared whenever the user is ready to start for real.
+ *
+ * Idempotent-ish by design: if the user already has a sample, its id is
+ * returned instead of creating a second one; if they already have real events,
+ * we refuse (the entry point only appears on the empty dashboard anyway).
+ */
+export async function createSampleEvent(): Promise<string> {
+  const userId = await getUserId()
+
+  const existing = (await sql`
+    SELECT id, is_sample FROM events WHERE user_id = ${userId}
+  `) as { id: string; is_sample: boolean }[]
+  const existingSample = existing.find((e) => e.is_sample)
+  if (existingSample) return existingSample.id
+  if (existing.length > 0) {
+    throw new Error(
+      "You already have events. Sample events are only for getting started.",
+    )
+  }
+
+  const eventRows = (await sql`
+    INSERT INTO events (
+      name, event_type, event_date, recipient_names, sender_signoff,
+      description, tone, email_design, user_id, is_sample
+    )
+    VALUES (
+      ${"Sample: Alex & Sam's Wedding"},
+      ${"wedding"},
+      ${null},
+      ${"Alex & Sam"},
+      ${"Alex & Sam"},
+      ${"This is a sample event so you can see how Thankful works end to end. The gifts and drafted notes below are examples — open one, tweak the wording, then delete this event whenever you're ready to start your own."},
+      ${"warm"},
+      ${"classic"},
+      ${userId},
+      ${true}
+    )
+    RETURNING id
+  `) as { id: string }[]
+  const eventId = eventRows[0].id
+
+  for (let position = 0; position < SAMPLE_GIFTS.length; position++) {
+    const g = SAMPLE_GIFTS[position]
+    const giftRows = (await sql`
+      INSERT INTO gifts (
+        event_id, giver, relationship, gift, reaction, quote,
+        giver_confidence, gift_confidence, needs_review, position
+      )
+      VALUES (
+        ${eventId}, ${g.giver}, ${g.relationship}, ${g.gift}, ${g.reaction}, '',
+        100, 100, false, ${position}
+      )
+      RETURNING id
+    `) as { id: string }[]
+
+    await sql`
+      INSERT INTO notes (event_id, gift_id, content, tone, status)
+      VALUES (${eventId}, ${giftRows[0].id}, ${g.note}, ${"warm"}, 'draft')
+    `
+  }
+
+  revalidatePath("/")
+  return eventId
 }
 
 /**
@@ -269,7 +382,7 @@ export async function processTranscript(
 
   const usage = await getUsage(userId)
   if (usage.atLimit) {
-    return { ok: false, code: "limit_reached", error: limitMessage(usage.limit) }
+    return { ok: false, code: "limit_reached", error: limitMessage(usage.limit, usage.lifetime) }
   }
 
   // 1) Extract the gifts, then 2) draft every note in a SINGLE batched call.
@@ -346,7 +459,7 @@ export type TranscribeMediaResult =
 /**
  * Transcribes an uploaded gift-opening recording (already sitting in Blob under
  * `event-media/<userId>/…`) into text, then deletes the blob. The transcript is
- * returned to the client for review — it is NOT auto-processed — so the user can
+ * returned to the client for review �� it is NOT auto-processed — so the user can
  * fix any mis-hearings before `processTranscript` extracts gifts from it.
  *
  * The plan gate is re-checked here even though the upload token route also checks
@@ -479,7 +592,7 @@ export async function addManualGift(
 
   const usage = await getUsage(userId)
   if (usage.atLimit) {
-    return { ok: false, code: "limit_reached", error: limitMessage(usage.limit) }
+    return { ok: false, code: "limit_reached", error: limitMessage(usage.limit, usage.lifetime) }
   }
 
   let noteContent: string
@@ -573,7 +686,7 @@ export async function addManualGiftsBulk(
 
   const usage = await getUsage(userId)
   if (usage.atLimit) {
-    return { ok: false, code: "limit_reached", error: limitMessage(usage.limit) }
+    return { ok: false, code: "limit_reached", error: limitMessage(usage.limit, usage.lifetime) }
   }
 
   // Draft every note in one call to stay fast and dodge per-minute rate limits.
@@ -661,7 +774,7 @@ export async function regenerateNote(
 
   const usage = await getUsage(userId)
   if (usage.atLimit) {
-    return { ok: false, code: "limit_reached", error: limitMessage(usage.limit) }
+    return { ok: false, code: "limit_reached", error: limitMessage(usage.limit, usage.lifetime) }
   }
 
   const giftRows = (await sql`SELECT * FROM gifts WHERE id = ${note.gift_id}`) as GiftRow[]
@@ -716,7 +829,7 @@ export async function regenerateAllNotes(
 
   const usage = await getUsage(userId)
   if (usage.atLimit) {
-    return { ok: false, code: "limit_reached", error: limitMessage(usage.limit) }
+    return { ok: false, code: "limit_reached", error: limitMessage(usage.limit, usage.lifetime) }
   }
 
   // One note per gift; order by the gift timeline so indices are stable.
@@ -902,7 +1015,7 @@ export async function sendNote(noteId: string): Promise<SendNoteResult> {
     return {
       ok: false,
       code: "limit_reached",
-      error: limitMessage(usage.limit),
+      error: limitMessage(usage.limit, usage.lifetime),
     }
   }
 

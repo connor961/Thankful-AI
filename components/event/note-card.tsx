@@ -15,6 +15,8 @@ import {
   ChevronDown,
   ClipboardCopy,
   UserPlus,
+  Printer,
+  Lock,
 } from "lucide-react"
 import {
   regenerateNote,
@@ -109,6 +111,7 @@ export function NoteCard({
   senderAddress,
   recipientAddress = null,
   returnAddress = null,
+  canPrint = false,
 }: {
   item: GiftWithNote
   suggestedEmail?: string
@@ -119,6 +122,8 @@ export function NoteCard({
   senderAddress?: string
   recipientAddress?: LabelAddress | null
   returnAddress?: LabelAddress | null
+  /** Whether printing & mailing is unlocked (paid plan or Event Pass). */
+  canPrint?: boolean
 }) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
@@ -447,7 +452,7 @@ export function NoteCard({
             photoUrl={photoUrl}
             senderAddress={senderAddress}
           />
-          {note ? (
+          {note && canPrint ? (
             <PrintCardDialog
               note={note.content}
               giver={item.giver}
@@ -457,7 +462,7 @@ export function NoteCard({
               disabled={pending}
             />
           ) : null}
-          {note ? (
+          {note && canPrint ? (
             <PrintPostcardDialog
               note={note.content}
               giver={item.giver}
@@ -466,6 +471,22 @@ export function NoteCard({
               returnAddress={returnAddress}
               disabled={pending}
             />
+          ) : null}
+          {note && !canPrint ? (
+            <Button
+              size="sm"
+              variant="ghost"
+              disabled={pending}
+              onClick={() =>
+                openUpgradeDialog(
+                  "Printing and mailing cards is available on any paid plan or with an Event Pass.",
+                )
+              }
+            >
+              <Printer data-icon="inline-start" />
+              Print &amp; mail
+              <Lock data-icon="inline-end" className="text-muted-foreground" />
+            </Button>
           ) : null}
           <DropdownMenu>
             <DropdownMenuTrigger

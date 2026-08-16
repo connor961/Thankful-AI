@@ -83,6 +83,7 @@ export default async function EventPage({
           returnAddress={returnAddress}
           senderAddress={outboundSenderAddress()}
           planId={usage?.planId}
+          canPrint={usage?.canPrint ?? false}
         />
       </main>
     </div>

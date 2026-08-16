@@ -12,6 +12,10 @@ export type HeaderUsage = {
   used: number
   limit: number | null
   unlimited: boolean
+  /** Free allowance is a lifetime total (no monthly reset) when true. */
+  lifetime: boolean
+  /** Whether the user may print & mail cards/labels (paid plan or Event Pass). */
+  canPrint: boolean
 }
 
 export function SiteHeader({
@@ -34,6 +38,7 @@ export function SiteHeader({
               used={usage.used}
               limit={usage.limit}
               unlimited={usage.unlimited}
+              lifetime={usage.lifetime}
             />
           ) : null}
           <Button
