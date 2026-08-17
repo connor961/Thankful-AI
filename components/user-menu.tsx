@@ -3,7 +3,7 @@
 import { useTransition } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { CreditCard, Settings, LogOut } from "lucide-react"
+import { CreditCard, Settings, LogOut, LayoutDashboard } from "lucide-react"
 
 import { signOut } from "@/lib/auth-client"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -32,7 +32,13 @@ function toInitials(name?: string | null, email?: string | null) {
   return (parts[0]![0]! + parts[parts.length - 1]![0]!).toUpperCase()
 }
 
-export function UserMenu({ user }: { user: SessionUser }) {
+export function UserMenu({
+  user,
+  isAdmin = false,
+}: {
+  user: SessionUser
+  isAdmin?: boolean
+}) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
 
@@ -77,6 +83,20 @@ export function UserMenu({ user }: { user: SessionUser }) {
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
+        {isAdmin ? (
+          <>
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                render={<Link href="/admin" />}
+                nativeButton={false}
+              >
+                <LayoutDashboard data-icon="inline-start" />
+                Admin
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+          </>
+        ) : null}
         <DropdownMenuGroup>
           <DropdownMenuItem
             render={<Link href="/settings" />}

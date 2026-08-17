@@ -1,6 +1,7 @@
 import "server-only"
 
 import { sql } from "@/lib/db"
+import { getOptionalUserId } from "@/lib/session"
 
 type RoleRow = { role: string | null }
 
@@ -26,4 +27,25 @@ export async function isAdmin(userId: string): Promise<boolean> {
     // rather than accidentally granting elevated access.
     return false
   }
+}
+
+/** True when the currently signed-in user is an admin (false when signed out). */
+export async function isCurrentUserAdmin(): Promise<boolean> {
+  const userId = await getOptionalUserId()
+  if (!userId) return false
+  return isAdmin(userId)
+}
+
+/**
+ * Guards an admin-only server context. Returns the admin's user id, or throws
+ * "Unauthorized" for signed-out users and non-admins alike — callers in route
+ * handlers / pages should catch this and respond with a 404/redirect so the
+ * existence of the admin surface isn't leaked to normal users.
+ */
+export async function requireAdmin(): Promise<string> {
+  const userId = await getOptionalUserId()
+  if (!userId || !(await isAdmin(userId))) {
+    throw new Error("Unauthorized")
+  }
+  return userId
 }

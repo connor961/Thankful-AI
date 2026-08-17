@@ -16,6 +16,8 @@ export type HeaderUsage = {
   lifetime: boolean
   /** Whether the user may print & mail cards/labels (paid plan or Event Pass). */
   canPrint: boolean
+  /** Whether the signed-in user is an admin (controls the admin nav link). */
+  isAdmin: boolean
 }
 
 export function SiteHeader({
@@ -68,7 +70,7 @@ export function SiteHeader({
             </Button>
           ) : null}
           {user ? (
-            <UserMenu user={user} />
+            <UserMenu user={user} isAdmin={usage?.isAdmin ?? false} />
           ) : (
             <>
               <Button

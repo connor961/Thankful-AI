@@ -2,6 +2,7 @@ import "server-only"
 
 import { getOptionalUserId } from "@/lib/session"
 import { getUsage } from "@/lib/billing"
+import { isAdmin } from "@/lib/admin"
 import type { HeaderUsage } from "@/components/site-header"
 import type { PlanId } from "@/lib/plans"
 
@@ -13,7 +14,7 @@ export async function getHeaderUsage(): Promise<HeaderUsage | null> {
   const userId = await getOptionalUserId()
   if (!userId) return null
 
-  const usage = await getUsage(userId)
+  const [usage, admin] = await Promise.all([getUsage(userId), isAdmin(userId)])
   return {
     planId: usage.plan.id as PlanId,
     planName: usage.plan.name,
@@ -22,5 +23,6 @@ export async function getHeaderUsage(): Promise<HeaderUsage | null> {
     unlimited: usage.unlimited,
     lifetime: usage.lifetime,
     canPrint: usage.canPrint,
+    isAdmin: admin,
   }
 }
