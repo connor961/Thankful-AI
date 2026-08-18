@@ -29,6 +29,7 @@ export async function setAdminRole(
   `
 
   revalidatePath("/admin")
+  revalidatePath(`/admin/users/${targetUserId}`)
   return { ok: true }
 }
 
@@ -49,5 +50,31 @@ export async function compEventPass(targetUserId: string): Promise<{ ok: true }>
   `
 
   revalidatePath("/admin")
+  revalidatePath(`/admin/users/${targetUserId}`)
+  return { ok: true }
+}
+
+/**
+ * Toggles a user's marketing/lifecycle email opt-out. Lets an admin honor a
+ * "please stop emailing me" request, or opt a user back in if they were
+ * removed by mistake. Insert/delete on the opt-out table is idempotent.
+ */
+export async function setEmailOptOut(
+  targetUserId: string,
+  optedOut: boolean,
+): Promise<{ ok: true }> {
+  await requireAdmin()
+
+  if (optedOut) {
+    await sql`
+      INSERT INTO email_opt_out (user_id) VALUES (${targetUserId})
+      ON CONFLICT (user_id) DO NOTHING
+    `
+  } else {
+    await sql`DELETE FROM email_opt_out WHERE user_id = ${targetUserId}`
+  }
+
+  revalidatePath("/admin")
+  revalidatePath(`/admin/users/${targetUserId}`)
   return { ok: true }
 }

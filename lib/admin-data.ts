@@ -2,6 +2,7 @@ import "server-only"
 
 import { sql } from "@/lib/db"
 import { getPlan, type PlanId } from "@/lib/plans"
+import { getUsage } from "@/lib/billing"
 
 /**
  * All admin analytics run as a set of small, independent aggregate queries so
@@ -258,4 +259,232 @@ export async function getAdminUsers(search = "", limit = 100): Promise<AdminUser
     hasActivePass: r.has_active_pass,
     optedOut: r.opted_out,
   }))
+}
+
+export type AdminUserEvent = {
+  id: string
+  name: string
+  eventType: string
+  eventDate: string | null
+  isSample: boolean
+  createdAt: string
+  notesTotal: number
+  notesSent: number
+}
+
+export type AdminUserPass = {
+  id: string
+  sendsTotal: number
+  sendsUsed: number
+  status: string
+  createdAt: string
+  isComp: boolean
+}
+
+export type AdminUserSubscription = {
+  plan: PlanId
+  planName: string
+  status: string
+  currentPeriodEnd: string | null
+  cancelAtPeriodEnd: boolean
+  stripeCustomerId: string | null
+}
+
+export type AdminUserActivityItem = {
+  type: "note_sent" | "lifecycle_email"
+  at: string
+  label: string
+}
+
+export type AdminUserDetail = {
+  id: string
+  name: string | null
+  email: string
+  emailVerified: boolean
+  role: string | null
+  createdAt: string
+  optedOut: boolean
+  activated: boolean
+  notesSentTotal: number
+  usage: {
+    used: number
+    limit: number
+    unlimited: boolean
+    lifetime: boolean
+    canPrint: boolean
+    planName: string
+  }
+  subscription: AdminUserSubscription | null
+  passes: AdminUserPass[]
+  events: AdminUserEvent[]
+  activity: AdminUserActivityItem[]
+}
+
+/**
+ * The full 360° view of one account for support and moderation: profile,
+ * billing (subscription + passes), every event with its note progress, and a
+ * merged activity timeline of note sends and lifecycle emails. Returns null
+ * when the id doesn't exist so the page can 404 cleanly. Read-only; callers
+ * MUST gate with requireAdmin() first.
+ */
+export async function getAdminUserDetail(
+  userId: string,
+): Promise<AdminUserDetail | null> {
+  const userRows = (await sql`
+    SELECT u.id, u.name, u.email, u."emailVerified" AS email_verified,
+           u.role, u."createdAt" AS created_at,
+           (oo.user_id IS NOT NULL) AS opted_out
+    FROM "user" u
+    LEFT JOIN email_opt_out oo ON oo.user_id = u.id
+    WHERE u.id = ${userId}
+  `) as {
+    id: string
+    name: string | null
+    email: string
+    email_verified: boolean
+    role: string | null
+    created_at: string
+    opted_out: boolean
+  }[]
+
+  const u = userRows[0]
+  if (!u) return null
+
+  const [subRows, passRows, eventRows, sendRows, lifecycleRows, usage] =
+    await Promise.all([
+      sql`
+        SELECT plan, status, current_period_end, cancel_at_period_end, stripe_customer_id
+        FROM subscriptions WHERE user_id = ${userId}
+      ` as Promise<
+        {
+          plan: PlanId
+          status: string
+          current_period_end: string | null
+          cancel_at_period_end: boolean
+          stripe_customer_id: string | null
+        }[]
+      >,
+      sql`
+        SELECT id, sends_total, sends_used, status, created_at, stripe_session_id
+        FROM event_passes WHERE user_id = ${userId}
+        ORDER BY created_at DESC
+      ` as Promise<
+        {
+          id: string
+          sends_total: number
+          sends_used: number
+          status: string
+          created_at: string
+          stripe_session_id: string
+        }[]
+      >,
+      sql`
+        SELECT e.id, e.name, e.event_type, e.event_date, e.is_sample, e.created_at,
+               COALESCE(n.total, 0)::int AS notes_total,
+               COALESCE(n.sent, 0)::int AS notes_sent
+        FROM events e
+        LEFT JOIN (
+          SELECT event_id,
+                 COUNT(*) AS total,
+                 COUNT(*) FILTER (WHERE status = 'sent') AS sent
+          FROM notes GROUP BY event_id
+        ) n ON n.event_id = e.id
+        WHERE e.user_id = ${userId}
+        ORDER BY e.created_at DESC
+      ` as Promise<
+        {
+          id: string
+          name: string
+          event_type: string
+          event_date: string | null
+          is_sample: boolean
+          created_at: string
+          notes_total: number
+          notes_sent: number
+        }[]
+      >,
+      sql`
+        SELECT ns.sent_at, e.name AS event_name
+        FROM note_sends ns
+        LEFT JOIN notes nt ON nt.id = ns.note_id
+        LEFT JOIN events e ON e.id = nt.event_id
+        WHERE ns.user_id = ${userId}
+        ORDER BY ns.sent_at DESC
+        LIMIT 25
+      ` as Promise<{ sent_at: string; event_name: string | null }[]>,
+      sql`
+        SELECT step, sent_at FROM lifecycle_emails
+        WHERE user_id = ${userId} ORDER BY sent_at DESC
+      ` as Promise<{ step: number; sent_at: string }[]>,
+      getUsage(userId),
+    ])
+
+  const sub = subRows[0]
+  const subscription: AdminUserSubscription | null = sub
+    ? {
+        plan: sub.plan,
+        planName: getPlan(sub.plan).name,
+        status: sub.status,
+        currentPeriodEnd: sub.current_period_end,
+        cancelAtPeriodEnd: sub.cancel_at_period_end,
+        stripeCustomerId: sub.stripe_customer_id,
+      }
+    : null
+
+  const activity: AdminUserActivityItem[] = [
+    ...sendRows.map((r) => ({
+      type: "note_sent" as const,
+      at: r.sent_at,
+      label: r.event_name
+        ? `Sent a thank-you note for “${r.event_name}”`
+        : "Sent a thank-you note",
+    })),
+    ...lifecycleRows.map((r) => ({
+      type: "lifecycle_email" as const,
+      at: r.sent_at,
+      label: `Received activation email (day ${r.step})`,
+    })),
+  ]
+    .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
+    .slice(0, 30)
+
+  return {
+    id: u.id,
+    name: u.name,
+    email: u.email,
+    emailVerified: u.email_verified,
+    role: u.role,
+    createdAt: u.created_at,
+    optedOut: u.opted_out,
+    activated: sendRows.length > 0,
+    notesSentTotal: sendRows.length,
+    usage: {
+      used: usage.used,
+      limit: usage.limit,
+      unlimited: usage.unlimited,
+      lifetime: usage.lifetime,
+      canPrint: usage.canPrint,
+      planName: usage.plan.name,
+    },
+    subscription,
+    passes: passRows.map((p) => ({
+      id: p.id,
+      sendsTotal: p.sends_total,
+      sendsUsed: p.sends_used,
+      status: p.status,
+      createdAt: p.created_at,
+      isComp: p.stripe_session_id.startsWith("comp_"),
+    })),
+    events: eventRows.map((e) => ({
+      id: e.id,
+      name: e.name,
+      eventType: e.event_type,
+      eventDate: e.event_date,
+      isSample: e.is_sample,
+      createdAt: e.created_at,
+      notesTotal: e.notes_total,
+      notesSent: e.notes_sent,
+    })),
+    activity,
+  }
 }
