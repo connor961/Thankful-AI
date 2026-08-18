@@ -36,7 +36,7 @@ export default async function AdminUserDetailPage({
     <div className="min-h-svh">
       <SiteHeader user={session.user} usage={headerUsage} />
       <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
-        <AdminUserDetail detail={detail} currentAdminId={session.user.id} />
+        <AdminUserDetail user={detail} currentAdminId={session.user.id} />
       </main>
     </div>
   )

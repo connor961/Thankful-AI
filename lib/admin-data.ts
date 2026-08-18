@@ -350,34 +350,17 @@ export async function getAdminUserDetail(
   const u = userRows[0]
   if (!u) return null
 
-  const [subRows, passRows, eventRows, sendRows, lifecycleRows, usage] =
+  const [subRowsRaw, passRowsRaw, eventRowsRaw, sendRowsRaw, lifecycleRowsRaw, usage] =
     await Promise.all([
       sql`
         SELECT plan, status, current_period_end, cancel_at_period_end, stripe_customer_id
         FROM subscriptions WHERE user_id = ${userId}
-      ` as Promise<
-        {
-          plan: PlanId
-          status: string
-          current_period_end: string | null
-          cancel_at_period_end: boolean
-          stripe_customer_id: string | null
-        }[]
-      >,
+      `,
       sql`
         SELECT id, sends_total, sends_used, status, created_at, stripe_session_id
         FROM event_passes WHERE user_id = ${userId}
         ORDER BY created_at DESC
-      ` as Promise<
-        {
-          id: string
-          sends_total: number
-          sends_used: number
-          status: string
-          created_at: string
-          stripe_session_id: string
-        }[]
-      >,
+      `,
       sql`
         SELECT e.id, e.name, e.event_type, e.event_date, e.is_sample, e.created_at,
                COALESCE(n.total, 0)::int AS notes_total,
@@ -391,18 +374,7 @@ export async function getAdminUserDetail(
         ) n ON n.event_id = e.id
         WHERE e.user_id = ${userId}
         ORDER BY e.created_at DESC
-      ` as Promise<
-        {
-          id: string
-          name: string
-          event_type: string
-          event_date: string | null
-          is_sample: boolean
-          created_at: string
-          notes_total: number
-          notes_sent: number
-        }[]
-      >,
+      `,
       sql`
         SELECT ns.sent_at, e.name AS event_name
         FROM note_sends ns
@@ -411,13 +383,47 @@ export async function getAdminUserDetail(
         WHERE ns.user_id = ${userId}
         ORDER BY ns.sent_at DESC
         LIMIT 25
-      ` as Promise<{ sent_at: string; event_name: string | null }[]>,
+      `,
       sql`
         SELECT step, sent_at FROM lifecycle_emails
         WHERE user_id = ${userId} ORDER BY sent_at DESC
-      ` as Promise<{ step: number; sent_at: string }[]>,
+      `,
       getUsage(userId),
     ])
+
+  const subRows = subRowsRaw as {
+    plan: PlanId
+    status: string
+    current_period_end: string | null
+    cancel_at_period_end: boolean
+    stripe_customer_id: string | null
+  }[]
+  const passRows = passRowsRaw as {
+    id: string
+    sends_total: number
+    sends_used: number
+    status: string
+    created_at: string
+    stripe_session_id: string
+  }[]
+  const eventRows = eventRowsRaw as {
+    id: string
+    name: string
+    event_type: string
+    event_date: string | null
+    is_sample: boolean
+    created_at: string
+    notes_total: number
+    notes_sent: number
+  }[]
+  const sendRows = sendRowsRaw as {
+    sent_at: string
+    event_name: string | null
+  }[]
+  const lifecycleRows = lifecycleRowsRaw as {
+    step: number
+    sent_at: string
+  }[]
 
   const sub = subRows[0]
   const subscription: AdminUserSubscription | null = sub
@@ -460,7 +466,7 @@ export async function getAdminUserDetail(
     notesSentTotal: sendRows.length,
     usage: {
       used: usage.used,
-      limit: usage.limit,
+      limit: usage.limit ?? 0,
       unlimited: usage.unlimited,
       lifetime: usage.lifetime,
       canPrint: usage.canPrint,
