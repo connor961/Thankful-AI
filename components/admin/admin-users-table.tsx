@@ -2,8 +2,16 @@
 
 import { useMemo, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { toast } from "sonner"
-import { Search, MoreVertical, Shield, ShieldOff, Ticket, Sparkles } from "lucide-react"
+import {
+  Search,
+  MoreVertical,
+  Shield,
+  ShieldOff,
+  Ticket,
+  Sparkles,
+} from "lucide-react"
 
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -107,7 +115,10 @@ export function AdminUsersTable({
               return (
                 <tr key={u.id} className="border-b last:border-0 hover:bg-muted/40">
                   <td className="px-4 py-3">
-                    <div className="flex flex-col">
+                    <Link
+                      href={`/admin/users/${u.id}`}
+                      className="flex flex-col rounded-sm outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+                    >
                       <span className="flex items-center gap-1.5 font-medium text-foreground">
                         {u.name || "—"}
                         {isUserAdmin ? (
@@ -120,7 +131,7 @@ export function AdminUsersTable({
                       <span className="text-xs text-muted-foreground">
                         {u.email}
                       </span>
-                    </div>
+                    </Link>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">
                     {joinedLabel(u.createdAt)}
