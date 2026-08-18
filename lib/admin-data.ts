@@ -350,8 +350,15 @@ export async function getAdminUserDetail(
   const u = userRows[0]
   if (!u) return null
 
-  const [subRowsRaw, passRowsRaw, eventRowsRaw, sendRowsRaw, lifecycleRowsRaw, usage] =
-    await Promise.all([
+  const [
+    subRowsRaw,
+    passRowsRaw,
+    eventRowsRaw,
+    sendRowsRaw,
+    lifecycleRowsRaw,
+    sendCountRaw,
+    usage,
+  ] = await Promise.all([
       sql`
         SELECT plan, status, current_period_end, cancel_at_period_end, stripe_customer_id
         FROM subscriptions WHERE user_id = ${userId}
@@ -388,8 +395,11 @@ export async function getAdminUserDetail(
         SELECT step, sent_at FROM lifecycle_emails
         WHERE user_id = ${userId} ORDER BY sent_at DESC
       `,
+      sql`SELECT COUNT(*)::int AS count FROM note_sends WHERE user_id = ${userId}`,
       getUsage(userId),
     ])
+
+  const notesSentTotal = (sendCountRaw as { count: number }[])[0]?.count ?? 0
 
   const subRows = subRowsRaw as {
     plan: PlanId
@@ -462,8 +472,8 @@ export async function getAdminUserDetail(
     role: u.role,
     createdAt: u.created_at,
     optedOut: u.opted_out,
-    activated: sendRows.length > 0,
-    notesSentTotal: sendRows.length,
+    activated: notesSentTotal > 0,
+    notesSentTotal,
     usage: {
       used: usage.used,
       limit: usage.limit ?? 0,

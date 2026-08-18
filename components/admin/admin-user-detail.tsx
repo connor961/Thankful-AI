@@ -338,6 +338,12 @@ export function AdminUserDetail({
                 ))}
               </ul>
             )}
+            {user.notesSentTotal > user.activity.length ? (
+              <p className="mt-3 text-xs text-muted-foreground">
+                Showing the latest {user.activity.length} of{" "}
+                {user.notesSentTotal} note sends.
+              </p>
+            ) : null}
           </CardContent>
         </Card>
       </div>
