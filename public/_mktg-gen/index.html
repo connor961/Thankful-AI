@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Thankful — Marketing Card Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,600;1,9..144,700;1,9..144,900&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,600&family=Caveat:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --cream: #fbf1e8;
+        --card: #fefbf7;
+        --ink: #3a231f;
+        --coral: #c84b5b;
+        --coral-soft: #f7d9d5;
+        --gold: #ebc08b;
+        --gold-muted: #e1ac74;
+        --muted: #6f5f58;
+        --cream-on-coral: #fbeee6;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        background: #ffffff;
+      }
+      #card {
+        position: relative;
+        overflow: hidden;
+        font-family: "Nunito", system-ui, sans-serif;
+        color: var(--ink);
+        display: flex;
+        flex-direction: column;
+      }
+      .serif {
+        font-family: "Fraunces", Georgia, serif;
+      }
+      .hand {
+        font-family: "Caveat", cursive;
+      }
+
+      /* ---- shared building blocks ---- */
+      .wordmark {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-family: "Fraunces", serif;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+      .wordmark .dot {
+        width: 16px;
+        height: 16px;
+        border-radius: 999px;
+        background: var(--coral);
+        display: inline-block;
+      }
+      .kicker {
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.22em;
+        color: var(--coral);
+      }
+      .body {
+        color: var(--muted);
+        line-height: 1.5;
+        font-weight: 600;
+      }
+      .cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--coral);
+        color: var(--cream-on-coral);
+        font-weight: 800;
+        border-radius: 999px;
+        width: fit-content;
+      }
+      .pill-tag {
+        display: inline-flex;
+        align-items: center;
+        background: var(--coral-soft);
+        color: var(--coral);
+        font-weight: 800;
+        border-radius: 999px;
+      }
+
+      /* backgrounds */
+      .bg-cream {
+        background: var(--cream);
+      }
+      .bg-coral {
+        background: var(--coral);
+      }
+      .accent-coral {
+        color: var(--coral);
+      }
+      .ink {
+        color: var(--ink);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="card"></div>
+    <script>
+      // ---------------------------------------------------------------
+      // Thankful Round 2 marketing card definitions (files 29–50).
+      // Rendered as HTML and screenshotted at exact pixel dimensions for
+      // crisp, on-brand typography that matches the Round 1 kit.
+      // ---------------------------------------------------------------
+      const SIZES = {
+        square: [1080, 1080],
+        vertical: [1080, 1350],
+        story: [1080, 1920],
+      };
+
+      const CARDS = [
+        // ---------- WEEK 5: Late isn't too late ----------
+        {
+          file: "29-hero-not-too-late-1080x1080",
+          type: "hero",
+          size: "square",
+          kicker: "It's never too late",
+          head: ["It's not too late", "to say thank you."],
+          accentLine: 1,
+          sub: "Behind on notes from months ago? Start today. Thankful helps you write them fast, in your own words — no shame, no blank-page dread.",
+          cta: "Get started free →",
+          tagline: "gratitude, made doable",
+        },
+        {
+          file: "30-statement-never-not-option-1080x1080",
+          type: "statement",
+          size: "square",
+          kicker: "A gentle nudge",
+          head: ["Better late", "than never —", "and “never”", "isn't an option."],
+          accentLine: 2,
+          sub: "The people who gave to you would still love to hear from you.",
+          cta: "Start free · link in bio",
+        },
+        {
+          file: "31-flexibility-start-with-one-1080x1080",
+          type: "hero",
+          size: "square",
+          kicker: "One at a time",
+          head: ["Behind on notes?", "Start with one."],
+          accentLine: 1,
+          sub: "You don't have to finish the pile today. Write one note. Thankful keeps the rest organized until you're ready for the next.",
+          cta: "Start free · link in bio",
+          tagline: "you've got this",
+        },
+
+        // ---------- WEEK 6: Beyond the wedding ----------
+        {
+          file: "32-occasion-sympathy-1080x1080",
+          type: "occasion",
+          size: "square",
+          tag: "Sympathy",
+          head: ["After a loss,", "every kindness", "deserves a word."],
+          accentLine: 2,
+          sub: "Flowers, meals, cards, and quiet help — Thankful keeps track of who showed up, so acknowledgments can wait until you're ready, and no one is missed.",
+          cta: "Start free · link in bio",
+        },
+        {
+          file: "33-occasion-teacher-1080x1080",
+          type: "occasion",
+          size: "square",
+          tag: "Teacher appreciation",
+          head: ["To the teacher", "who changed", "their year."],
+          accentLine: 2,
+          sub: "End-of-year, holidays, or just because — help your kids thank the people shaping them, in words that sound like your family.",
+          cta: "Start free · link in bio",
+        },
+        {
+          file: "34-occasion-retirement-1080x1080",
+          type: "occasion",
+          size: "square",
+          tag: "Retirement",
+          head: ["A career's worth", "of thank-yous,", "in one place."],
+          accentLine: 2,
+          sub: "Colleagues, mentors, clients, and friends. Capture who to thank, then write each note without losing a weekend to it.",
+          cta: "Start free · link in bio",
+        },
+        {
+          file: "35-occasion-clients-1080x1080",
+          type: "occasion",
+          size: "square",
+          tag: "For business",
+          head: ["Clients remember", "who says", "thank you."],
+          accentLine: 2,
+          sub: "A genuine note after a project, a referral, or a renewal goes further than any discount. Track every client and thank them in your voice.",
+          cta: "Start free · link in bio",
+        },
+        {
+          file: "36-occasion-donors-1080x1080",
+          type: "occasion",
+          size: "square",
+          tag: "For nonprofits",
+          head: ["Every donor", "kept your", "cause going."],
+          accentLine: 2,
+          sub: "Keep track of who gave and how much it mattered, then send warm, personal acknowledgments — not another form letter.",
+          cta: "Start free · link in bio",
+        },
+
+        // ---------- WEEK 7: Make it personal ----------
+        {
+          file: "37-feature-gift-tracking-1080x1080",
+          type: "feature",
+          size: "square",
+          tag: "Track",
+          kicker: "Gift & giver log",
+          head: ["Never lose track", "of who gave what."],
+          body: "Log every gift, giver, and the little detail that made it special. When it's time to write, the context is already there.",
+          cta: "Start free · link in bio",
+        },
+        {
+          file: "38-feature-tone-1080x1080",
+          type: "feature",
+          size: "square",
+          tag: "Write",
+          kicker: "Set the tone",
+          head: ["Warm, formal,", "or playful —", "your call."],
+          body: "The same thank-you can sound like a heartfelt friend or a polished professional. Pick the tone; the note still sounds like you.",
+          cta: "Start free · link in bio",
+        },
+        {
+          file: "39-feature-multi-event-1080x1080",
+          type: "feature",
+          size: "square",
+          tag: "Organize",
+          kicker: "One tidy place",
+          head: ["Every event,", "one tidy", "place."],
+          body: "Wedding, shower, birthday, and the holidays — keep each event's gifts and notes separate and organized, all in one account.",
+          cta: "Start free · link in bio",
+        },
+        {
+          file: "40-feature-reminders-1080x1080",
+          type: "feature",
+          size: "square",
+          tag: "Finish",
+          kicker: "Gentle nudges",
+          head: ["A nudge,", "never a", "nag."],
+          body: "See what's written and what's left at a glance, so the last few notes actually get sent — no sticky notes, no guilt spirals.",
+          cta: "Start free · link in bio",
+        },
+
+        // ---------- Quotes ----------
+        {
+          file: "41-quote-worth-it-1080x1080",
+          type: "quote",
+          size: "square",
+          quote:
+            "It took a weekend I'd dreaded for months and turned it into one easy afternoon.",
+          author: "A Thankful user",
+        },
+        {
+          file: "42-quote-sounds-like-me-1080x1080",
+          type: "quote",
+          size: "square",
+          quote:
+            "People told me the notes sounded exactly like me. That's the whole point.",
+          author: "A Thankful user",
+        },
+        {
+          file: "43-quote-wish-sooner-1080x1080",
+          type: "quote",
+          size: "square",
+          quote: "Honestly? I wish I'd had this right after my wedding.",
+          author: "A Thankful user",
+        },
+
+        // ---------- Tips ----------
+        {
+          file: "44-tip-awkward-gift-1080x1350",
+          type: "tip",
+          size: "vertical",
+          kicker: "When it's awkward",
+          head: ["What to write", "when you didn't", "love the gift"],
+          items: [
+            "Thank the effort, not the object — “you thought of me”",
+            "Name one true positive: the color, the gesture, the timing",
+            "Look forward: “can't wait to see you soon”",
+          ],
+          cta: "Start free · link in bio",
+        },
+        {
+          file: "45-tip-timeline-1080x1080",
+          type: "tip",
+          size: "square",
+          kicker: "The real rule",
+          head: ["How long do you", "have to send it?"],
+          items: [
+            "Weddings: within 3 months is ideal",
+            "Showers & birthdays: within 2 weeks",
+            "The honest truth: late is always better than never",
+          ],
+          cta: "Start free · link in bio",
+        },
+        {
+          file: "46-tip-openers-1080x1350",
+          type: "tip",
+          size: "vertical",
+          kicker: "Better beginnings",
+          head: ["5 openers better", "than “Thank you", "for the…”"],
+          items: [
+            "“You have no idea how much…”",
+            "“I keep thinking about…”",
+            "“The moment I opened it…”",
+            "“It meant so much that you…”",
+            "“I've already put it to use —”",
+          ],
+          cta: "Start free · link in bio",
+        },
+
+        // ---------- Stats ----------
+        {
+          file: "47-stat-never-sent-1080x1080",
+          type: "stat",
+          size: "square",
+          big: "Most",
+          head: ["thank-you notes", "that get put off…"],
+          punch: "never get sent.",
+          sub: "Not for lack of gratitude — for lack of a system. Here's yours.",
+          cta: "Start free · link in bio",
+        },
+        {
+          file: "48-stat-five-minutes-1080x1080",
+          type: "stat",
+          size: "square",
+          big: "≈5 min",
+          head: ["per note, once the", "details are captured."],
+          punch: "Not a whole afternoon.",
+          sub: "Draft ready, giver remembered — you just make it yours and send.",
+          cta: "Start free · link in bio",
+        },
+
+        // ---------- Statement ----------
+        {
+          file: "49-statement-note-gets-kept-1080x1080",
+          type: "statement",
+          size: "square",
+          kicker: "Why it matters",
+          head: ["A text", "disappears.", "A note", "gets kept."],
+          accentLine: 3,
+          sub: "Say it in a way they'll want to hold onto.",
+          cta: "Start free · link in bio",
+        },
+
+        // ---------- Story ----------
+        {
+          file: "50-story-start-with-one-1080x1920",
+          type: "story",
+          size: "story",
+          kicker: "This weekend",
+          head: ["Start with", "one note", "today."],
+          accentLine: 1,
+          sub: "The pile you've been avoiding? It starts clearing the moment you write the first one.",
+          poll: "Challenge: clear your pile this weekend. In?",
+          cta: "Start free → link sticker",
+        },
+      ];
+
+      // ---- helpers ----
+      function esc(s) {
+        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+      }
+      function headHTML(lines, accentLine) {
+        return lines
+          .map((l, i) =>
+            i === accentLine
+              ? `<span class="accent-coral" style="font-style:italic">${esc(l)}</span>`
+              : `<span>${esc(l)}</span>`,
+          )
+          .join("<br/>");
+      }
+
+      function render(card) {
+        const [w, h] = SIZES[card.size];
+        const el = document.getElementById("card");
+        el.style.width = w + "px";
+        el.style.height = h + "px";
+
+        if (card.type === "hero" || card.type === "statement") {
+          el.className = "bg-cream";
+          const pad = 92;
+          el.style.padding = pad + "px";
+          el.innerHTML = `
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div class="wordmark ink" style="font-size:34px"><span class="dot"></span>Thankful</div>
+              ${card.kicker ? `<div class="kicker" style="font-size:19px">${esc(card.kicker)}</div>` : ""}
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+              <h1 class="serif ink" style="font-weight:900;font-size:${card.head.length > 3 ? 96 : 112}px;line-height:1.02;letter-spacing:-0.02em">
+                ${headHTML(card.head, card.accentLine)}
+              </h1>
+              ${card.sub ? `<p class="body" style="font-size:34px;margin-top:38px;max-width:88%">${esc(card.sub)}</p>` : ""}
+            </div>
+            <div style="display:flex;align-items:flex-end;justify-content:space-between">
+              <div class="cta" style="font-size:29px;padding:26px 42px">${esc(card.cta)}</div>
+              ${card.tagline ? `<div class="hand accent-coral" style="font-size:44px">${esc(card.tagline)}</div>` : ""}
+            </div>`;
+          return;
+        }
+
+        if (card.type === "occasion") {
+          el.className = "bg-cream";
+          el.style.padding = "92px";
+          el.innerHTML = `
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div class="wordmark ink" style="font-size:34px"><span class="dot"></span>Thankful</div>
+              <div class="pill-tag" style="font-size:22px;padding:14px 28px">${esc(card.tag)}</div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+              <h1 class="serif ink" style="font-weight:900;font-size:98px;line-height:1.03;letter-spacing:-0.02em">
+                ${headHTML(card.head, card.accentLine)}
+              </h1>
+              <p class="body" style="font-size:33px;margin-top:38px;max-width:90%">${esc(card.sub)}</p>
+            </div>
+            <div class="cta" style="font-size:29px;padding:26px 42px">${esc(card.cta)}</div>`;
+          return;
+        }
+
+        if (card.type === "feature") {
+          el.className = "bg-cream";
+          el.style.padding = "78px";
+          el.innerHTML = `
+            <div class="wordmark accent-coral" style="font-size:34px;margin-bottom:40px"><span class="dot"></span>Thankful</div>
+            <div style="flex:1;background:var(--card);border-radius:44px;padding:76px;display:flex;flex-direction:column;box-shadow:0 40px 80px -50px rgba(58,35,31,0.45)">
+              <div class="pill-tag" style="font-size:24px;padding:14px 34px;margin-bottom:40px">${esc(card.tag)}</div>
+              <div class="kicker" style="font-size:22px;margin-bottom:26px">${esc(card.kicker)}</div>
+              <h1 class="serif ink" style="font-weight:900;font-size:88px;line-height:1.02;letter-spacing:-0.02em">
+                ${headHTML(card.head, -1)}
+              </h1>
+              <p class="body" style="font-size:33px;margin-top:36px">${esc(card.body)}</p>
+              <div style="flex:1"></div>
+              <div class="cta" style="font-size:28px;padding:24px 40px;margin-top:52px">${esc(card.cta)}</div>
+            </div>`;
+          return;
+        }
+
+        if (card.type === "quote") {
+          el.className = "bg-coral";
+          el.style.padding = "100px";
+          el.style.color = "var(--cream-on-coral)";
+          el.innerHTML = `
+            <div class="serif" style="color:var(--gold);font-size:180px;line-height:0.7;font-weight:900;height:120px">&ldquo;</div>
+            <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+              <blockquote class="serif" style="font-weight:700;font-size:76px;line-height:1.12;color:var(--cream-on-coral)">
+                ${esc(card.quote)}
+              </blockquote>
+              <div style="color:var(--gold);font-size:30px;font-weight:800;margin-top:48px">— ${esc(card.author)}</div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div class="wordmark" style="font-size:34px;color:var(--cream-on-coral)"><span class="dot" style="background:var(--gold)"></span>Thankful</div>
+              <div style="font-size:27px;font-weight:700;color:var(--cream-on-coral);opacity:0.85">Get started free</div>
+            </div>`;
+          return;
+        }
+
+        if (card.type === "tip") {
+          el.className = "bg-cream";
+          el.style.padding = "88px";
+          const rows = card.items
+            .map(
+              (t) => `
+              <div style="display:flex;align-items:center;gap:26px;background:var(--card);border:1px solid rgba(200,75,91,0.12);border-radius:26px;padding:28px 34px">
+                <span style="flex:none;width:52px;height:52px;border-radius:999px;background:var(--coral);display:flex;align-items:center;justify-content:center">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </span>
+                <span class="ink" style="font-size:30px;font-weight:700;line-height:1.25">${esc(t)}</span>
+              </div>`,
+            )
+            .join("");
+          el.innerHTML = `
+            <div class="wordmark accent-coral" style="font-size:32px"><span class="dot"></span>Thankful</div>
+            <div class="kicker" style="font-size:21px;margin-top:44px">${esc(card.kicker)}</div>
+            <h1 class="serif ink" style="font-weight:900;font-size:${card.size === "vertical" ? 82 : 76}px;line-height:1.03;letter-spacing:-0.02em;margin-top:20px">
+              ${headHTML(card.head, -1)}
+            </h1>
+            <div style="display:flex;flex-direction:column;gap:24px;margin-top:52px">${rows}</div>
+            <div style="flex:1"></div>
+            <div class="cta" style="font-size:27px;padding:24px 40px;margin-top:52px">${esc(card.cta)}</div>`;
+          return;
+        }
+
+        if (card.type === "stat") {
+          el.className = "bg-cream";
+          el.style.padding = "92px";
+          el.innerHTML = `
+            <div class="wordmark accent-coral" style="font-size:34px"><span class="dot"></span>Thankful</div>
+            <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+              <div class="serif accent-coral" style="font-weight:900;font-size:190px;line-height:0.9;letter-spacing:-0.03em">${esc(card.big)}</div>
+              <h1 class="serif ink" style="font-weight:800;font-size:66px;line-height:1.08;margin-top:18px">
+                ${headHTML(card.head, -1)}<br/><span class="accent-coral" style="font-style:italic">${esc(card.punch)}</span>
+              </h1>
+              <p class="body" style="font-size:31px;margin-top:34px;max-width:90%">${esc(card.sub)}</p>
+            </div>
+            <div class="cta" style="font-size:28px;padding:24px 40px">${esc(card.cta)}</div>`;
+          return;
+        }
+
+        if (card.type === "story") {
+          el.className = "bg-cream";
+          el.style.padding = "110px 92px";
+          el.innerHTML = `
+            <div class="wordmark ink" style="font-size:36px;justify-content:center"><span class="dot"></span>Thankful</div>
+            <div style="flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center;align-items:center">
+              <div class="kicker" style="font-size:24px">${esc(card.kicker)}</div>
+              <h1 class="serif ink" style="font-weight:900;font-size:130px;line-height:1.0;letter-spacing:-0.02em;margin-top:34px">
+                ${headHTML(card.head, card.accentLine)}
+              </h1>
+              <p class="body" style="font-size:38px;margin-top:44px;max-width:86%">${esc(card.sub)}</p>
+              <div style="margin-top:70px;background:var(--card);border:1px solid rgba(200,75,91,0.14);border-radius:34px;padding:40px 46px;font-size:34px;font-weight:800;color:var(--ink);max-width:92%">${esc(card.poll)}</div>
+            </div>
+            <div class="cta" style="font-size:32px;padding:30px 52px;margin:0 auto">${esc(card.cta)}</div>`;
+          return;
+        }
+      }
+
+      const params = new URLSearchParams(location.search);
+      const i = parseInt(params.get("i") || "0", 10);
+      render(CARDS[i]);
+      window.__CARD__ = CARDS[i];
+      document.title = CARDS[i].file;
+    </script>
+  </body>
+</html>
