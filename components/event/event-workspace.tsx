@@ -290,6 +290,7 @@ export function EventWorkspace({
             senderAddress={senderAddress}
             recipientAddress={addressFor(item.giver)}
             returnAddress={returnAddress}
+            canPrint={canPrint}
           />
         ))}
       </TabsContent>
