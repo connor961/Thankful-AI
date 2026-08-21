@@ -39,14 +39,14 @@ export function ExportMenu({
   items,
   contactAddresses = {},
   returnAddress = null,
-  canPrint = false,
+  canPrint,
 }: {
   event: EventRow
   items: GiftWithNote[]
   contactAddresses?: Record<string, LabelAddress>
   returnAddress?: LabelAddress | null
   /** Whether printing & mailing is unlocked (paid plan or Event Pass). */
-  canPrint?: boolean
+  canPrint: boolean
 }) {
   const count = shareableItems(items).length
   const slug = slugify(event.name)

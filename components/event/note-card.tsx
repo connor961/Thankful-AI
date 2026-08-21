@@ -111,7 +111,7 @@ export function NoteCard({
   senderAddress,
   recipientAddress = null,
   returnAddress = null,
-  canPrint = false,
+  canPrint,
 }: {
   item: GiftWithNote
   suggestedEmail?: string
@@ -122,8 +122,12 @@ export function NoteCard({
   senderAddress?: string
   recipientAddress?: LabelAddress | null
   returnAddress?: LabelAddress | null
-  /** Whether printing & mailing is unlocked (paid plan or Event Pass). */
-  canPrint?: boolean
+  /**
+   * Whether printing & mailing is unlocked (paid plan or Event Pass).
+   * Required on purpose: an optional default of `false` previously let a caller
+   * omit it and silently lock printing for paying customers.
+   */
+  canPrint: boolean
 }) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
