@@ -1,10 +1,12 @@
 "use client"
 
-import { useState, useTransition, type ReactNode } from "react"
+import { useMemo, useState, useTransition, type ReactNode } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { Gift as GiftIcon } from "lucide-react"
+import { Gift as GiftIcon, Mail, MapPin } from "lucide-react"
 import { addManualGift } from "@/app/actions/events"
+import type { ContactPick } from "@/app/actions/contacts"
+import { ContactCombobox } from "@/components/event/contact-combobox"
 import { openUpgradeDialog } from "@/components/billing/upgrade-dialog"
 import {
   Dialog,
@@ -22,7 +24,15 @@ import { Textarea } from "@/components/ui/textarea"
 import { Field, FieldGroup, FieldLabel, FieldDescription } from "@/components/ui/field"
 import { Spinner } from "@/components/ui/spinner"
 
-export function ManualGiftDialog({ eventId, trigger }: { eventId: string; trigger: ReactNode }) {
+export function ManualGiftDialog({
+  eventId,
+  trigger,
+  contacts = [],
+}: {
+  eventId: string
+  trigger: ReactNode
+  contacts?: ContactPick[]
+}) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [pending, startTransition] = useTransition()
@@ -31,6 +41,14 @@ export function ManualGiftDialog({ eventId, trigger }: { eventId: string; trigge
   const [giver, setGiver] = useState("")
   const [relationship, setRelationship] = useState("")
   const [commentary, setCommentary] = useState("")
+
+  // Surface a reuse hint when the entered giver exactly matches a saved contact
+  // that has an email and/or mailing address we can automatically apply.
+  const matchedContact = useMemo(() => {
+    const key = giver.trim().toLowerCase()
+    if (!key) return null
+    return contacts.find((c) => c.name.trim().toLowerCase() === key) ?? null
+  }, [giver, contacts])
 
   function reset() {
     setGift("")
@@ -125,13 +143,47 @@ export function ManualGiftDialog({ eventId, trigger }: { eventId: string; trigge
             </Field>
             <Field>
               <FieldLabel htmlFor="m-giver">Who it&apos;s from</FieldLabel>
-              <Input
-                id="m-giver"
-                placeholder="Aunt Marie"
-                value={giver}
-                onChange={(e) => setGiver(e.target.value)}
-                disabled={pending}
-              />
+              {contacts.length > 0 ? (
+                <ContactCombobox
+                  id="m-giver"
+                  placeholder="Aunt Marie"
+                  value={giver}
+                  onValueChange={setGiver}
+                  onSelectContact={(c) => {
+                    setGiver(c.name)
+                    if (c.relationship) setRelationship(c.relationship)
+                  }}
+                  contacts={contacts}
+                  disabled={pending}
+                />
+              ) : (
+                <Input
+                  id="m-giver"
+                  placeholder="Aunt Marie"
+                  value={giver}
+                  onChange={(e) => setGiver(e.target.value)}
+                  disabled={pending}
+                />
+              )}
+              {matchedContact && (matchedContact.hasEmail || matchedContact.hasAddress) ? (
+                <FieldDescription className="flex flex-wrap items-center gap-x-3 gap-y-1 text-primary">
+                  <span className="inline-flex items-center gap-1">
+                    Saved contact — we&apos;ll reuse their
+                  </span>
+                  {matchedContact.hasEmail ? (
+                    <span className="inline-flex items-center gap-1">
+                      <Mail className="size-3.5" />
+                      email
+                    </span>
+                  ) : null}
+                  {matchedContact.hasAddress ? (
+                    <span className="inline-flex items-center gap-1">
+                      <MapPin className="size-3.5" />
+                      mailing address
+                    </span>
+                  ) : null}
+                </FieldDescription>
+              ) : null}
             </Field>
             <Field>
               <FieldLabel htmlFor="m-rel">Relationship (optional)</FieldLabel>

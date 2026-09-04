@@ -9,6 +9,7 @@ import {
   getContactEmailMap,
   getContactNames,
   getContactAddressMap,
+  getContactPickList,
 } from "@/app/actions/contacts"
 import { getUserSettings } from "@/app/actions/settings"
 import { getSession } from "@/lib/session"
@@ -29,15 +30,23 @@ export default async function EventPage({
   const event = await getEvent(id)
   if (!event) notFound()
 
-  const [gifts, contactEmails, contactNames, contactAddresses, settings, usage] =
-    await Promise.all([
-      getGiftsWithNotes(id),
-      getContactEmailMap(),
-      getContactNames(),
-      getContactAddressMap(),
-      getUserSettings(),
-      getHeaderUsage(),
-    ])
+  const [
+    gifts,
+    contactEmails,
+    contactNames,
+    contactAddresses,
+    contactPicks,
+    settings,
+    usage,
+  ] = await Promise.all([
+    getGiftsWithNotes(id),
+    getContactEmailMap(),
+    getContactNames(),
+    getContactAddressMap(),
+    getContactPickList(),
+    getUserSettings(),
+    getHeaderUsage(),
+  ])
 
   // Map the saved return address into the flat label shape, or null if unset.
   const returnAddressFields = {
@@ -80,6 +89,7 @@ export default async function EventPage({
           contactEmails={contactEmails}
           contactNames={contactNames}
           contactAddresses={contactAddresses}
+          contactPicks={contactPicks}
           returnAddress={returnAddress}
           senderAddress={outboundSenderAddress()}
           planId={usage?.planId}

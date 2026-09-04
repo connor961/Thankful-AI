@@ -96,6 +96,48 @@ export async function getContactNames(): Promise<string[]> {
   return rows.map((r) => r.name.trim().toLowerCase())
 }
 
+/** A compact contact for reuse pickers at gift-entry time. */
+export type ContactPick = {
+  name: string
+  relationship: string
+  hasEmail: boolean
+  hasAddress: boolean
+}
+
+/**
+ * Returns a lightweight, client-safe list of saved contacts for reuse when
+ * adding gifts (name + relationship + whether we already have an email/address
+ * on file). Deliberately omits full addresses so we don't ship every contact's
+ * mailing details to the browser — those are resolved server-side by name at
+ * print/send time. Sorted by name for a stable picker order.
+ */
+export async function getContactPickList(): Promise<ContactPick[]> {
+  const userId = await getUserId()
+  const rows = (await sql`
+    SELECT name, relationship, email,
+           address_line1, address_line2, city, state, postal_code, country
+    FROM contacts
+    WHERE user_id = ${userId}
+    ORDER BY lower(name) ASC
+  `) as {
+    name: string
+    relationship: string
+    email: string
+    address_line1: string
+    address_line2: string
+    city: string
+    state: string
+    postal_code: string
+    country: string
+  }[]
+  return rows.map((r) => ({
+    name: r.name.trim(),
+    relationship: r.relationship?.trim() ?? "",
+    hasEmail: Boolean(r.email && r.email.trim()),
+    hasAddress: hasMailingAddress(r),
+  }))
+}
+
 export async function createContact(input: ContactInput): Promise<Contact> {
   const userId = await getUserId()
   const rows = (await sql`
