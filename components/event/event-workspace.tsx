@@ -14,6 +14,7 @@ import {
 } from "lucide-react"
 import type { EventRow, GiftWithNote, LabelAddress } from "@/lib/types"
 import type { PlanId } from "@/lib/plans"
+import type { ContactPick } from "@/app/actions/contacts"
 import { NoteCard } from "@/components/event/note-card"
 import { CapturePanel } from "@/components/event/capture-panel"
 import { AnalyticsPanel } from "@/components/event/analytics-panel"
@@ -52,6 +53,7 @@ export function EventWorkspace({
   contactEmails = {},
   contactNames = [],
   contactAddresses = {},
+  contactPicks = [],
   returnAddress = null,
   senderAddress,
   planId,
@@ -62,6 +64,7 @@ export function EventWorkspace({
   contactEmails?: Record<string, string>
   contactNames?: string[]
   contactAddresses?: Record<string, LabelAddress>
+  contactPicks?: ContactPick[]
   returnAddress?: LabelAddress | null
   senderAddress?: string
   planId?: PlanId
@@ -144,6 +147,7 @@ export function EventWorkspace({
           <div className="flex flex-wrap items-center justify-center gap-2">
             <ManualGiftDialog
               eventId={event.id}
+              contacts={contactPicks}
               trigger={
                 <Button variant="outline" size="sm">
                   <Gift data-icon="inline-start" />
@@ -153,6 +157,7 @@ export function EventWorkspace({
             />
             <BulkGiftDialog
               eventId={event.id}
+              contacts={contactPicks}
               trigger={
                 <Button variant="outline" size="sm">
                   <ListPlus data-icon="inline-start" />
@@ -258,6 +263,7 @@ export function EventWorkspace({
           </Dialog>
           <BulkGiftDialog
             eventId={event.id}
+            contacts={contactPicks}
             trigger={
               <Button variant="outline" size="sm">
                 <ListPlus data-icon="inline-start" />
@@ -267,6 +273,7 @@ export function EventWorkspace({
           />
           <ManualGiftDialog
             eventId={event.id}
+            contacts={contactPicks}
             trigger={
               <Button size="sm">
                 <Gift data-icon="inline-start" />

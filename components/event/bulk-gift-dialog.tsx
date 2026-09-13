@@ -12,6 +12,7 @@ import {
   Download,
 } from "lucide-react"
 import { addManualGiftsBulk } from "@/app/actions/events"
+import type { ContactPick } from "@/app/actions/contacts"
 import { openUpgradeDialog } from "@/components/billing/upgrade-dialog"
 import {
   Dialog,
@@ -158,14 +159,24 @@ function parseCsv(text: string): Row[] {
 export function BulkGiftDialog({
   eventId,
   trigger,
+  contacts = [],
 }: {
   eventId: string
   trigger: ReactNode
+  contacts?: ContactPick[]
 }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [pending, startTransition] = useTransition()
   const [tab, setTab] = useState("rows")
+
+  // Lower-cased name -> relationship, for auto-filling a row's relationship when
+  // its giver exactly matches a saved contact.
+  const contactByName = useMemo(() => {
+    const map = new Map<string, ContactPick>()
+    for (const c of contacts) map.set(c.name.trim().toLowerCase(), c)
+    return map
+  }, [contacts])
 
   const [rows, setRows] = useState<Row[]>(() => blankRows(3))
   const [pasteText, setPasteText] = useState("")
@@ -184,6 +195,20 @@ export function BulkGiftDialog({
 
   function updateRow(id: number, patch: Partial<Row>) {
     setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)))
+  }
+
+  // Updating a giver also snaps to a saved contact: on an exact name match we
+  // fill the relationship if the user hasn't typed one, so reused people carry
+  // their saved relationship without extra effort.
+  function handleGiverChange(row: Row, value: string) {
+    const match = contactByName.get(value.trim().toLowerCase())
+    updateRow(row.id, {
+      giver: value,
+      relationship:
+        match && match.relationship && !row.relationship.trim()
+          ? match.relationship
+          : row.relationship,
+    })
   }
 
   function removeRow(id: number) {
@@ -329,6 +354,13 @@ export function BulkGiftDialog({
             </TabsList>
 
             <TabsContent value="rows" className="flex flex-col gap-3">
+              {contacts.length > 0 ? (
+                <datalist id="bulk-contact-names">
+                  {contacts.map((c) => (
+                    <option key={c.name} value={c.name} />
+                  ))}
+                </datalist>
+              ) : null}
               <div className="hidden grid-cols-[1fr_1fr_140px_auto] gap-2 px-1 text-xs font-medium text-muted-foreground sm:grid">
                 <span>Gift</span>
                 <span>Who it&apos;s from</span>
@@ -353,7 +385,10 @@ export function BulkGiftDialog({
                       aria-label={`Who gift ${i + 1} is from`}
                       placeholder="Aunt Marie"
                       value={row.giver}
-                      onChange={(e) => updateRow(row.id, { giver: e.target.value })}
+                      onChange={(e) => handleGiverChange(row, e.target.value)}
+                      list={
+                        contacts.length > 0 ? "bulk-contact-names" : undefined
+                      }
                       disabled={pending}
                     />
                     <Input
