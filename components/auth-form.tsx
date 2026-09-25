@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { toast } from "sonner"
 import { ArrowRight } from "lucide-react"
+import { analytics } from "@heycatch/sdk"
 
 import { signIn, signUp } from "@/lib/auth-client"
 import { claimOrphanEventsIfFirstUser } from "@/app/actions/auth"
@@ -62,7 +63,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
     }
 
     startTransition(async () => {
-      const { error } =
+      const { data, error } =
         mode === "sign-up"
           ? await signUp.email({ email: email.trim(), password, name: name.trim() })
           : await signIn.email({ email: email.trim(), password })
@@ -70,6 +71,16 @@ export function AuthForm({ mode }: { mode: Mode }) {
       if (error) {
         toast.error(error.message ?? "Something went wrong. Please try again.")
         return
+      }
+
+      const user = data?.user
+      if (user) {
+        analytics.setIdentity(
+          user.id,
+          { email: user.email, name: user.name },
+          { signup_date: new Date(user.createdAt).toISOString() },
+        )
+        if (mode === "sign-up") analytics.trackEvent("signup_completed")
       }
 
       if (mode === "sign-up") {
