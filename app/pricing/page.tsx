@@ -8,12 +8,15 @@ import { getSubscription } from "@/lib/billing"
 import { getPlan } from "@/lib/plans"
 
 export const metadata = {
-  title: "Pricing",
+  title: {
+    absolute:
+      "Thankful Pricing - AI Thank-You Note Plans from $5/mo + Event Pass",
+  },
   description:
     "Monthly plans for year-round celebrations, plus a one-time Event Pass for a single big event like a wedding or baby shower.",
   alternates: { canonical: "/pricing" },
   openGraph: {
-    title: "Pricing | Thankful",
+    title: "Thankful Pricing - AI Thank-You Note Plans from $5/mo + Event Pass",
     description:
       "Monthly plans for year-round celebrations, plus a one-time Event Pass for a single big event like a wedding or baby shower.",
     url: "/pricing",

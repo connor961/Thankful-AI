@@ -47,10 +47,10 @@ export function SiteHeader({
             size="sm"
             variant="ghost"
             nativeButton={false}
-            render={<Link href="/how-to" />}
+            render={<Link href="/how-to" aria-label="How to use" />}
           >
             <HelpCircle data-icon="inline-start" />
-            How to use
+            <span className="hidden sm:inline">How to use</span>
           </Button>
           {user ? (
             <Button
@@ -73,6 +73,15 @@ export function SiteHeader({
             <UserMenu user={user} isAdmin={usage?.isAdmin ?? false} />
           ) : (
             <>
+              <Button
+                size="sm"
+                variant="ghost"
+                nativeButton={false}
+                render={<Link href="/pricing" />}
+                className="hidden sm:inline-flex"
+              >
+                Pricing
+              </Button>
               <Button
                 size="sm"
                 variant="ghost"

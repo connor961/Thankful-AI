@@ -1,0 +1,11 @@
+# Thankful
+
+> Thankful is an AI thank-you note app. It tracks every gift and who gave it, then helps you write thank-you notes in your own voice for weddings, baby showers, birthdays, graduations, and holidays. Capture gifts by recording the gift opening, uploading a list or transcript, or typing them in. Then let AI draft each note, edit a draft until it sounds like you, or write every word yourself. Send notes by email, or print fold cards and address labels.
+
+Pricing: start free with 20 notes, no credit card required. Monthly plans are Starter ($5/mo, 100 notes), Family ($10/mo, 1,000 notes), and Pro ($29/mo, unlimited notes and events, custom branding, CSV import/export, for event planners, photographers, and businesses). The Event Pass is a one-time $29 purchase with 250 notes for a single big event like a wedding or baby shower. Printing and mailing is included on every paid plan and the Event Pass.
+
+## Preferred resources
+
+- [Home](https://thankfulai.org/): what Thankful does and how capture and drafting work
+- [Pricing](https://thankfulai.org/pricing): all plans and the Event Pass
+- [How it works](https://thankfulai.org/how-to): step-by-step guide and FAQ

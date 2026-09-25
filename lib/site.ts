@@ -9,7 +9,7 @@
 export const SITE_NAME = "Thankful"
 
 export const SITE_DESCRIPTION =
-  "Thankful keeps track of every gift, who gave it, and what made it meaningful — so you can say thank you in your own voice. Record, upload, or type; let AI draft, work hybrid, or write every word yourself."
+  "Thankful tracks every gift and who gave it, then drafts thank-you notes in your voice. Record, upload, or type - AI draft, hybrid edit, or write it yourself."
 
 /**
  * The canonical production domain. This is the single source of truth for the

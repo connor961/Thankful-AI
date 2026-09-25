@@ -221,6 +221,21 @@ export default async function HowToPage() {
         </section>
 
         {/* FAQ */}
+        <script
+          type="application/ld+json"
+          // Static, server-rendered FAQ copy — safe to inject.
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: FAQS.map((item) => ({
+                "@type": "Question",
+                name: item.q,
+                acceptedAnswer: { "@type": "Answer", text: item.a },
+              })),
+            }),
+          }}
+        />
         <section className="mb-20">
           <div className="mb-8 flex flex-col gap-2">
             <h2 className="font-serif text-3xl font-semibold tracking-tight">

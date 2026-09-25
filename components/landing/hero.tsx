@@ -81,28 +81,29 @@ export function Hero() {
         <div className="flex flex-col gap-6">
           <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
             <Sparkles className="size-3.5 text-primary" />
-            Thank-you notes, on your terms
+            Thank-you notes for weddings, baby showers, and every gift that
+            deserves one
           </span>
 
-          {/* Rotating headline */}
-          <div className="relative" aria-live="polite">
-            <h1
+          {/* One H1 whose text rotates; the invisible div reserves height. */}
+          <div className="relative">
+            <div
               aria-hidden="true"
               className="invisible max-w-xl font-serif text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl"
             >
               {TALLEST_HEADLINE}
-            </h1>
-            {SLIDES.map((slide, i) => (
-              <h1
-                key={slide.headline}
-                aria-hidden={i === index ? undefined : "true"}
-                className={`absolute inset-0 max-w-xl font-serif text-4xl font-semibold leading-[1.05] tracking-tight text-balance transition-opacity duration-700 ease-in-out sm:text-5xl lg:text-6xl ${
-                  i === index ? "opacity-100" : "opacity-0"
-                }`}
+            </div>
+            <h1
+              aria-live="polite"
+              className="absolute inset-0 max-w-xl font-serif text-4xl font-semibold leading-[1.05] tracking-tight text-balance sm:text-5xl lg:text-6xl"
+            >
+              <span
+                key={index}
+                className="block animate-in fade-in duration-700 ease-in-out"
               >
-                {slide.headline}
-              </h1>
-            ))}
+                {SLIDES[index].headline}
+              </span>
+            </h1>
           </div>
 
           {/* Rotating subheading */}
@@ -163,8 +164,10 @@ export function Hero() {
             </Button>
           </div>
           <p className="text-sm text-muted-foreground">
-            You stay in control — record, upload, or type; let it draft or write
-            every word yourself. No pressure, no lock-in.
+            <span className="font-medium text-foreground">
+              20 free notes, no credit card required
+            </span>
+            {" — paid plans from $5/mo, less than a pack of stationery."}
           </p>
         </div>
 

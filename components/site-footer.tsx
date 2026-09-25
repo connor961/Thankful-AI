@@ -33,6 +33,13 @@ export function SiteFooter() {
           </span>
           <span aria-hidden="true">&middot;</span>
           <Link
+            href="/pricing"
+            className="font-medium underline-offset-4 hover:text-foreground hover:underline"
+          >
+            Pricing
+          </Link>
+          <span aria-hidden="true">&middot;</span>
+          <Link
             href="/privacy"
             className="font-medium underline-offset-4 hover:text-foreground hover:underline"
           >
