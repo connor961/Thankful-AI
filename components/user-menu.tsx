@@ -4,6 +4,7 @@ import { useTransition } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { CreditCard, Settings, LogOut, LayoutDashboard } from "lucide-react"
+import { analytics } from "@heycatch/sdk"
 
 import { signOut } from "@/lib/auth-client"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -45,6 +46,7 @@ export function UserMenu({
   function handleSignOut() {
     startTransition(async () => {
       await signOut()
+      analytics.resetIdentity()
       router.push("/sign-in")
       router.refresh()
     })

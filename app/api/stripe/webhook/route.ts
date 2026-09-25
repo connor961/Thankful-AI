@@ -7,10 +7,13 @@ import {
   userIdForCustomer,
   upsertSubscription,
 } from "@/lib/billing"
-import { type PlanId } from "@/lib/plans"
+import { type PlanId, planForPriceId } from "@/lib/plans"
+import { analytics } from "@heycatch/sdk"
 
 // Stripe requires the raw body to verify the signature.
 export const runtime = "nodejs"
+
+analytics.init({ projectKey: "hck_pk_SonSnxOKKCVtZu1iW0z75-XRYWgXvege" })
 
 export async function POST(req: NextRequest) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET
@@ -49,6 +52,11 @@ export async function POST(req: NextRequest) {
         if (session.mode === "payment" && session.metadata?.kind === "event_pass") {
           if (session.payment_status === "paid") {
             await fulfillEventPass(userId, session.id)
+            await analytics.trackEvent(
+              "event_pass_purchased",
+              { amount: (session.amount_total ?? 0) / 100, currency: session.currency },
+              { userId },
+            )
           }
           break
         }
@@ -59,6 +67,9 @@ export async function POST(req: NextRequest) {
             session.subscription as string,
           )
           await syncSubscription(userId, subscription)
+          const plan = planForPriceId(subscription.items.data[0]?.price.id)?.id ?? "free"
+          await analytics.setIdentity(userId, { plan })
+          await analytics.trackEvent("subscription_started", { plan }, { userId })
         }
         break
       }
@@ -85,6 +96,8 @@ export async function POST(req: NextRequest) {
             currentPeriodEnd: null,
             cancelAtPeriodEnd: false,
           })
+          await analytics.setIdentity(userId, { plan: "free" })
+          await analytics.trackEvent("subscription_canceled", {}, { userId })
         }
         break
       }
