@@ -353,6 +353,8 @@ export type RunSummary = {
   dryRun: boolean
   considered: number
   sent: { userId: string; email: string; step: number }[]
+  /** Dry run only: which step each eligible user would receive. */
+  planned: { userId: string; step: number }[]
   errors: { userId: string; step: number; error: string }[]
 }
 
@@ -386,10 +388,12 @@ export async function runSequence({
     dryRun,
     considered: eligible.length,
     sent: [],
+    planned: [],
     errors: [],
   }
 
   if (dryRun) {
+    summary.planned = eligible.map((u) => ({ userId: u.userId, step: u.step }))
     for (const u of eligible) {
       console.log(
         `[v0] lifecycle dry-run: would send step ${u.step} to ${u.email} (${u.userId})`,
