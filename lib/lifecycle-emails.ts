@@ -81,6 +81,12 @@ export const SEQUENCE: SequenceStep[] = [
   },
 ]
 
+/**
+ * Accounts at least this old with no emails sent are past the normal sequence
+ * window and receive only the final step.
+ */
+const LATE_START_AGE_DAYS = 14
+
 /** A user eligible to receive a given step. */
 export type EligibleUser = {
   userId: string
@@ -285,11 +291,29 @@ export async function findEligible(): Promise<EligibleUser[]> {
 
   const now = Date.now()
   const eligible: EligibleUser[] = []
+  const finalStep = SEQUENCE[SEQUENCE.length - 1]
 
   for (const row of rows) {
     if (!row.email) continue
     const ageDays = (now - new Date(row.created_at).getTime()) / 86_400_000
     const sent = new Set(row.sent_steps ?? [])
+
+    // The final step ends the sequence, whether reached normally or as a
+    // late-start catch-up.
+    if (sent.has(finalStep.step)) continue
+
+    // People who signed up long before emails went live never got the early
+    // "welcome" steps. Sending them day-1 copy weeks later would read oddly, so
+    // they get only the gentle final "no rush" email, once.
+    if (sent.size === 0 && ageDays >= LATE_START_AGE_DAYS) {
+      eligible.push({
+        userId: row.user_id,
+        email: row.email,
+        name: row.name,
+        step: finalStep.step,
+      })
+      continue
+    }
     const daysSinceLastSend = row.last_sent_at
       ? (now - new Date(row.last_sent_at).getTime()) / 86_400_000
       : Number.POSITIVE_INFINITY
