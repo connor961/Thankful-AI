@@ -30,6 +30,14 @@ export default async function EventPage({
   const event = await getEvent(id)
   if (!event) notFound()
 
+  // Printing is only enforced in the UI via `canPrint`, which a user could flip
+  // client-side. The mailing data that makes labels and postcards usable is
+  // therefore only fetched and serialized for entitled users.
+  const usagePromise = getHeaderUsage()
+  const contactAddressesPromise = usagePromise.then((u) =>
+    u?.canPrint ? getContactAddressMap() : {},
+  )
+
   const [
     gifts,
     contactEmails,
@@ -42,11 +50,12 @@ export default async function EventPage({
     getGiftsWithNotes(id),
     getContactEmailMap(),
     getContactNames(),
-    getContactAddressMap(),
+    contactAddressesPromise,
     getContactPickList(),
     getUserSettings(),
-    getHeaderUsage(),
+    usagePromise,
   ])
+  const canPrint = usage?.canPrint ?? false
 
   // Map the saved return address into the flat label shape, or null if unset.
   const returnAddressFields = {
@@ -57,9 +66,8 @@ export default async function EventPage({
     postal_code: settings.return_postal_code,
     country: settings.return_country,
   }
-  const returnAddress: LabelAddress | null = hasMailingAddress(
-    returnAddressFields,
-  )
+  const returnAddress: LabelAddress | null =
+    canPrint && hasMailingAddress(returnAddressFields)
     ? {
         name: settings.return_name,
         line1: settings.return_line1,
@@ -93,7 +101,7 @@ export default async function EventPage({
           returnAddress={returnAddress}
           senderAddress={outboundSenderAddress()}
           planId={usage?.planId}
-          canPrint={usage?.canPrint ?? false}
+          canPrint={canPrint}
         />
       </main>
     </div>
