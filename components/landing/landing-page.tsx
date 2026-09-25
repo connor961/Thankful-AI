@@ -13,6 +13,7 @@ import {
   Heart,
   ArrowRight,
   Check,
+  Briefcase,
 } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { Hero } from "@/components/landing/hero"
@@ -30,6 +31,7 @@ export function LandingPage() {
         <CaptureFork />
         <NotesFork />
         <MoreWays />
+        <ForProfessionals />
         <HowItWorks />
         <Voices />
         <FinalCta />
@@ -118,7 +120,7 @@ function CaptureFork() {
     <ForkSection
       eyebrow="Step 1 — Capture"
       title="Get your gifts in, however you like."
-      subtitle="Opening presents in a rush? Already have a list? Prefer to type as you go? Every path leads to the same place."
+      subtitle="Opening presents in a rush at your baby shower? Already have a wedding registry list? Prefer to type as you go? Every path leads to the same place."
       options={[
         {
           icon: Mic,
@@ -150,7 +152,7 @@ function NotesFork() {
     <ForkSection
       eyebrow="Step 2 — The notes"
       title="Write them your way."
-      subtitle="The AI is there for the starting point and the details, not the personal thought behind it. You decide how much help you want."
+      subtitle="Whether it's 150 wedding thank-you notes or a handful from a baby shower, the AI is there for the starting point and the details, not the personal thought behind it. You decide how much help you want."
       inverted
       options={[
         {
@@ -232,6 +234,40 @@ function MoreWays() {
             </div>
           </div>
         ))}
+      </div>
+    </section>
+  )
+}
+
+/* ------------------------- For professionals --------------------------- */
+
+function ForProfessionals() {
+  return (
+    <section className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6 sm:pb-24">
+      <div className="flex flex-col gap-6 rounded-2xl border bg-card p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+        <div className="flex gap-4">
+          <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-secondary text-primary">
+            <Briefcase className="size-5" />
+          </div>
+          <div className="flex flex-col gap-1">
+            <h2 className="font-serif text-xl font-semibold text-balance">
+              For event planners and photographers
+            </h2>
+            <p className="text-sm leading-relaxed text-muted-foreground text-pretty">
+              Manage client thank-you notes with custom branding, CSV import,
+              and unlimited events on the Pro plan.
+            </p>
+          </div>
+        </div>
+        <Button
+          variant="outline"
+          nativeButton={false}
+          render={<Link href="/pricing" />}
+          className="shrink-0"
+        >
+          See Pro pricing
+          <ArrowRight data-icon="inline-end" />
+        </Button>
       </div>
     </section>
   )
