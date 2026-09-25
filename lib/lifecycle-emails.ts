@@ -265,7 +265,8 @@ export async function findEligible(): Promise<EligibleUser[]> {
       COALESCE(
         ARRAY_AGG(le.step) FILTER (WHERE le.step IS NOT NULL),
         ARRAY[]::int[]
-      ) AS sent_steps
+      ) AS sent_steps,
+      MAX(le.sent_at) AS last_sent_at
     FROM public."user" u
     LEFT JOIN public.note_sends ns ON ns.user_id = u.id
     LEFT JOIN public.email_opt_out oo ON oo.user_id = u.id
@@ -279,6 +280,7 @@ export async function findEligible(): Promise<EligibleUser[]> {
     name: string | null
     created_at: string
     sent_steps: number[]
+    last_sent_at: string | null
   }[]
 
   const now = Date.now()
@@ -288,15 +290,21 @@ export async function findEligible(): Promise<EligibleUser[]> {
     if (!row.email) continue
     const ageDays = (now - new Date(row.created_at).getTime()) / 86_400_000
     const sent = new Set(row.sent_steps ?? [])
+    const daysSinceLastSend = row.last_sent_at
+      ? (now - new Date(row.last_sent_at).getTime()) / 86_400_000
+      : Number.POSITIVE_INFINITY
 
     // Walk the sequence in order. The next step to send is the first one that:
-    //  - hasn't been sent, and
-    //  - the account is old enough for.
-    // If an earlier step hasn't been sent yet but they're already old enough
-    // for it, that earlier step is what they get (sequential, no skipping).
-    for (const s of SEQUENCE) {
+    //  - hasn't been sent,
+    //  - the account is old enough for, and
+    //  - is spaced from the previous email by the same gap as the schedule
+    //    (day 1 -> day 3 = 2 days), so a late start never bunches emails up.
+    for (let i = 0; i < SEQUENCE.length; i++) {
+      const s = SEQUENCE[i]
       if (sent.has(s.step)) continue
-      if (ageDays >= s.minAgeDays) {
+      const prev = SEQUENCE[i - 1]
+      const minGapDays = prev ? s.minAgeDays - prev.minAgeDays : 0
+      if (ageDays >= s.minAgeDays && daysSinceLastSend >= minGapDays) {
         eligible.push({
           userId: row.user_id,
           email: row.email,
